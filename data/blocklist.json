@@ -1,0 +1,6 @@
+{
+    "description": "Products to exclude from the catalog. Add slugs here to prevent them from appearing.",
+    "blocklist": [
+        "0001-bulbasaur-halloween"
+    ]
+}
