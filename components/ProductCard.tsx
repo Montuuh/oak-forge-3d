@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Product } from "@/types/product";
-import { formatPrintTime, formatWeight } from "@/lib/products";
+import { formatPrintTime, formatWeight, resolveProductImagePath } from "@/lib/products";
 import { useFavorites } from "@/contexts/FavoritesContext";
 
 interface ProductCardProps {
@@ -14,6 +14,7 @@ interface ProductCardProps {
 export default function ProductCard({ product, index = 0 }: ProductCardProps) {
     const { isFavorite, toggleFavorite } = useFavorites();
     const isProductFavorite = isFavorite(product.slug);
+    const imagePath = resolveProductImagePath(product);
 
     // Stagger animation delay
     const delay = Math.min(index * 50, 500);
@@ -34,7 +35,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
                 {/* Image */}
                 <div className="relative aspect-square overflow-hidden bg-dark-900">
                     <Image
-                        src={product.image_path}
+                        src={imagePath}
                         alt={product.name}
                         fill
                         className="object-cover transition-transform duration-500 group-hover:scale-110"

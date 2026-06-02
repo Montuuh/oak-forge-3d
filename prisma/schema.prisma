@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ProductStatus {
+  draft
+  in_review
+  published
+  archived
+}
+
+enum ImageStatus {
+  candidate
+  approved
+  rejected
+}
+
+enum ImageOrigin {
+  ai_generated
+  real_photo
+}
+
+model Product {
+  id                  String        @id @default(cuid())
+  slug                String        @unique
+  n3dSlug             String?
+  name                String
+  category            String
+  status              ProductStatus @default(draft)
+  isVisibleInCatalog  Boolean       @default(false)
+  shortDescription    String?
+  longDescription     String?
+  priceCents          Int?
+  printTime           String?
+  printTimeSeconds    Int?
+  weightGrams         Float?
+  pokemonName         String?
+  pokedexNumber       Int?
+  pokemonTypes        String[]
+  tags                String[]
+  featured            Boolean       @default(false)
+  available           Boolean       @default(true)
+  primaryImageId      String?
+  images              ProductImage[]
+  taxonomyLinks       ProductTaxonomy[]
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+}
+
+model ProductImage {
+  id            String      @id @default(cuid())
+  productId     String
+  product       Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  status        ImageStatus @default(candidate)
+  origin        ImageOrigin
+  imagePath     String
+  promptVersion String?
+  promptText    String?
+  sourceModel   String?
+  reviewedBy    String?
+  reviewedAt    DateTime?
+  notes         String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([productId, status])
+}
+
+model Taxonomy {
+  id        String            @id @default(cuid())
+  name      String
+  slug      String            @unique
+  kind      String
+  links     ProductTaxonomy[]
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+}
+
+model ProductTaxonomy {
+  productId  String
+  taxonomyId String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  taxonomy   Taxonomy @relation(fields: [taxonomyId], references: [id], onDelete: Cascade)
+
+  @@id([productId, taxonomyId])
+  @@index([taxonomyId])
+}

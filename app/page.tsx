@@ -99,11 +99,17 @@ export default function Home() {
                     ) : (
                         <div className="text-center py-20 glass rounded-2xl">
                             <div className="text-6xl mb-4">🌳</div>
-                            <h3 className="text-xl font-semibold mb-2">Catálogo Vacío</h3>
-                            <p className="text-zinc-400 mb-4">
-                                Ejecuta <code className="bg-zinc-800 px-2 py-1 rounded">npm run sync</code> para
-                                sincronizar los productos.
+                            <h3 className="text-xl font-semibold mb-2">Catálogo en preparación</h3>
+                            <p className="text-zinc-400 mb-4 max-w-md mx-auto">
+                                Estamos preparando las figuras y sus imágenes. Mientras tanto, escríbenos
+                                por Instagram si te interesa algún diseño.
                             </p>
+                            <a
+                                href="#contacto"
+                                className="inline-flex px-5 py-2.5 rounded-xl bg-oak-600 text-white text-sm font-medium hover:bg-oak-500 transition-colors"
+                            >
+                                Contactar
+                            </a>
                         </div>
                     )}
                 </div>

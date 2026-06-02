@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { getAllProductSlugs, getProductBySlug, formatPrintTime, formatWeight } from "@/lib/products";
+import { getAllProductSlugs, getProductBySlug, formatPrintTime, formatWeight, resolveProductImagePath } from "@/lib/products";
 import type { Metadata } from "next";
 
 interface PageProps {
@@ -24,6 +24,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         };
     }
 
+    const imagePath = resolveProductImagePath(product);
+
     return {
         title: `${product.name} | Oak's Forge 3D`,
         description: product.custom_description ||
@@ -31,7 +33,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         openGraph: {
             title: product.name,
             description: product.custom_description || `Figura 3D: ${product.name}`,
-            images: [product.image_path],
+            images: [imagePath],
         },
     };
 }
@@ -42,6 +44,7 @@ export default function ProductPage({ params }: PageProps) {
     if (!product) {
         notFound();
     }
+    const imagePath = resolveProductImagePath(product);
 
     const typeColors: Record<string, string> = {
         normal: 'bg-gray-400',
@@ -91,7 +94,7 @@ export default function ProductPage({ params }: PageProps) {
                     <div className="relative">
                         <div className="aspect-square relative rounded-2xl overflow-hidden glass-strong">
                             <Image
-                                src={product.image_path}
+                                src={imagePath}
                                 alt={product.name}
                                 fill
                                 className="object-cover"

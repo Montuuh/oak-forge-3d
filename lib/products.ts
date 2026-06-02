@@ -1,56 +1,65 @@
 /**
- * Product data access layer
- * Reads from the local products.json file
+ * Public catalog data access layer.
+ * Reads from data/catalog-public.json (exported from admin DB).
  */
 
 import { Product, ProductsData, ProductCategory } from '@/types/product';
-import productsData from '@/data/products.json';
+import catalogData from '@/data/catalog-public.json';
 
-const data = productsData as ProductsData;
+const data = catalogData as ProductsData;
+
+function isVisibleInCatalog(product: Product): boolean {
+    return product.visible_in_catalog !== false;
+}
+
+function getCatalogProducts(): Product[] {
+    return data.products.filter(isVisibleInCatalog);
+}
 
 /**
- * Get all products
+ * Get all products visible on the public catalog
  */
 export function getAllProducts(): Product[] {
-    return data.products;
+    return getCatalogProducts();
 }
 
 /**
  * Get products filtered by category
  */
 export function getProductsByCategory(category: ProductCategory): Product[] {
+    const products = getCatalogProducts();
     if (category === 'all') {
-        return data.products;
+        return products;
     }
-    return data.products.filter(p => p.category === category);
+    return products.filter(p => p.category === category);
 }
 
 /**
  * Get a single product by slug
  */
 export function getProductBySlug(slug: string): Product | undefined {
-    return data.products.find(p => p.slug === slug);
+    return getCatalogProducts().find(p => p.slug === slug);
 }
 
 /**
  * Get all product slugs (for static generation)
  */
 export function getAllProductSlugs(): string[] {
-    return data.products.map(p => p.slug);
+    return getCatalogProducts().map(p => p.slug);
 }
 
 /**
  * Get featured products
  */
 export function getFeaturedProducts(): Product[] {
-    return data.products.filter(p => p.featured === true);
+    return getCatalogProducts().filter(p => p.featured === true);
 }
 
 /**
  * Get available products only
  */
 export function getAvailableProducts(): Product[] {
-    return data.products.filter(p => p.available !== false);
+    return getCatalogProducts().filter(p => p.available !== false);
 }
 
 /**
@@ -61,10 +70,11 @@ export function getCatalogInfo(): {
     lastUpdated: string;
     totalProducts: number;
 } {
+    const products = getCatalogProducts();
     return {
         version: data.version,
         lastUpdated: data.last_updated,
-        totalProducts: data.total_products,
+        totalProducts: products.length,
     };
 }
 
@@ -92,4 +102,16 @@ export function formatWeight(grams: number): string {
         return `${(grams / 1000).toFixed(1)}kg`;
     }
     return `${Math.round(grams)}g`;
+}
+
+/**
+ * Resolve the display image path for a product.
+ * Prefers approved AI assets and falls back to the default image.
+ */
+export function resolveProductImagePath(product: Product): string {
+    if (product.ai_asset?.status === 'approved' && product.ai_asset.approved_image_path) {
+        return product.ai_asset.approved_image_path;
+    }
+
+    return product.image_path;
 }

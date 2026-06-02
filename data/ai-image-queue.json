@@ -1,0 +1,107 @@
+{
+  "version": "1.0.0",
+  "generated_at": "2026-06-02T12:36:13.405Z",
+  "total_items": 10,
+  "items": [
+    {
+      "slug": "0001-bulbasaur",
+      "product_name": "0001 - Bulbasaur",
+      "status": "pending_generation",
+      "prompt_version": "v1-lifestyle-real-print",
+      "style": "lifestyle_scene",
+      "requested_candidates": 5,
+      "candidates": [],
+      "notes": "Generate a photorealistic lifestyle photo of a 3D printed decorative Pokeball-inspired collectible. Product name: 0001 - Bulbasaur. Category: character. The object must look like a real PLA print: subtle layer lines, realistic lighting, physically plausible reflections, no warping. Scene: premium desk/shelf lifestyle setup, shallow depth of field, no text overlays, no logos, no watermarks. Do not copy any existing product photography. Produce an original composition."
+    },
+    {
+      "slug": "0001-bulbasaur-christmas",
+      "product_name": "0001 - Bulbasaur - Christmas",
+      "status": "pending_generation",
+      "prompt_version": "v1-lifestyle-real-print",
+      "style": "lifestyle_scene",
+      "requested_candidates": 5,
+      "candidates": [],
+      "notes": "Generate a photorealistic lifestyle photo of a 3D printed decorative Pokeball-inspired collectible. Product name: 0001 - Bulbasaur - Christmas. Category: character. The object must look like a real PLA print: subtle layer lines, realistic lighting, physically plausible reflections, no warping. Scene: premium desk/shelf lifestyle setup, shallow depth of field, no text overlays, no logos, no watermarks. Do not copy any existing product photography. Produce an original composition."
+    },
+    {
+      "slug": "0001-bulbasaur-love",
+      "product_name": "0001 - Bulbasaur - Love",
+      "status": "pending_generation",
+      "prompt_version": "v1-lifestyle-real-print",
+      "style": "lifestyle_scene",
+      "requested_candidates": 5,
+      "candidates": [],
+      "notes": "Generate a photorealistic lifestyle photo of a 3D printed decorative Pokeball-inspired collectible. Product name: 0001 - Bulbasaur - Love. Category: character. The object must look like a real PLA print: subtle layer lines, realistic lighting, physically plausible reflections, no warping. Scene: premium desk/shelf lifestyle setup, shallow depth of field, no text overlays, no logos, no watermarks. Do not copy any existing product photography. Produce an original composition."
+    },
+    {
+      "slug": "0002-ivysaur",
+      "product_name": "0002 - Ivysaur",
+      "status": "pending_generation",
+      "prompt_version": "v1-lifestyle-real-print",
+      "style": "lifestyle_scene",
+      "requested_candidates": 5,
+      "candidates": [],
+      "notes": "Generate a photorealistic lifestyle photo of a 3D printed decorative Pokeball-inspired collectible. Product name: 0002 - Ivysaur. Category: character. The object must look like a real PLA print: subtle layer lines, realistic lighting, physically plausible reflections, no warping. Scene: premium desk/shelf lifestyle setup, shallow depth of field, no text overlays, no logos, no watermarks. Do not copy any existing product photography. Produce an original composition."
+    },
+    {
+      "slug": "0003-venusaur",
+      "product_name": "0003 - Venusaur",
+      "status": "pending_generation",
+      "prompt_version": "v1-lifestyle-real-print",
+      "style": "lifestyle_scene",
+      "requested_candidates": 5,
+      "candidates": [],
+      "notes": "Generate a photorealistic lifestyle photo of a 3D printed decorative Pokeball-inspired collectible. Product name: 0003 - Venusaur. Category: character. The object must look like a real PLA print: subtle layer lines, realistic lighting, physically plausible reflections, no warping. Scene: premium desk/shelf lifestyle setup, shallow depth of field, no text overlays, no logos, no watermarks. Do not copy any existing product photography. Produce an original composition."
+    },
+    {
+      "slug": "0004-charmander",
+      "product_name": "0004 - Charmander",
+      "status": "pending_generation",
+      "prompt_version": "v1-lifestyle-real-print",
+      "style": "lifestyle_scene",
+      "requested_candidates": 5,
+      "candidates": [],
+      "notes": "Generate a photorealistic lifestyle photo of a 3D printed decorative Pokeball-inspired collectible. Product name: 0004 - Charmander. Category: character. The object must look like a real PLA print: subtle layer lines, realistic lighting, physically plausible reflections, no warping. Scene: premium desk/shelf lifestyle setup, shallow depth of field, no text overlays, no logos, no watermarks. Do not copy any existing product photography. Produce an original composition."
+    },
+    {
+      "slug": "0005-charmeleon",
+      "product_name": "0005 - Charmeleon",
+      "status": "pending_generation",
+      "prompt_version": "v1-lifestyle-real-print",
+      "style": "lifestyle_scene",
+      "requested_candidates": 5,
+      "candidates": [],
+      "notes": "Generate a photorealistic lifestyle photo of a 3D printed decorative Pokeball-inspired collectible. Product name: 0005 - Charmeleon. Category: character. The object must look like a real PLA print: subtle layer lines, realistic lighting, physically plausible reflections, no warping. Scene: premium desk/shelf lifestyle setup, shallow depth of field, no text overlays, no logos, no watermarks. Do not copy any existing product photography. Produce an original composition."
+    },
+    {
+      "slug": "0006-charizard",
+      "product_name": "0006 - Charizard",
+      "status": "pending_generation",
+      "prompt_version": "v1-lifestyle-real-print",
+      "style": "lifestyle_scene",
+      "requested_candidates": 5,
+      "candidates": [],
+      "notes": "Generate a photorealistic lifestyle photo of a 3D printed decorative Pokeball-inspired collectible. Product name: 0006 - Charizard. Category: character. The object must look like a real PLA print: subtle layer lines, realistic lighting, physically plausible reflections, no warping. Scene: premium desk/shelf lifestyle setup, shallow depth of field, no text overlays, no logos, no watermarks. Do not copy any existing product photography. Produce an original composition."
+    },
+    {
+      "slug": "0006-mega-charizard-x",
+      "product_name": "0006 - Mega Charizard X",
+      "status": "pending_generation",
+      "prompt_version": "v1-lifestyle-real-print",
+      "style": "lifestyle_scene",
+      "requested_candidates": 5,
+      "candidates": [],
+      "notes": "Generate a photorealistic lifestyle photo of a 3D printed decorative Pokeball-inspired collectible. Product name: 0006 - Mega Charizard X. Category: character. The object must look like a real PLA print: subtle layer lines, realistic lighting, physically plausible reflections, no warping. Scene: premium desk/shelf lifestyle setup, shallow depth of field, no text overlays, no logos, no watermarks. Do not copy any existing product photography. Produce an original composition."
+    },
+    {
+      "slug": "0007-squirtle",
+      "product_name": "0007 - Squirtle",
+      "status": "pending_generation",
+      "prompt_version": "v1-lifestyle-real-print",
+      "style": "lifestyle_scene",
+      "requested_candidates": 5,
+      "candidates": [],
+      "notes": "Generate a photorealistic lifestyle photo of a 3D printed decorative Pokeball-inspired collectible. Product name: 0007 - Squirtle. Category: character. The object must look like a real PLA print: subtle layer lines, realistic lighting, physically plausible reflections, no warping. Scene: premium desk/shelf lifestyle setup, shallow depth of field, no text overlays, no logos, no watermarks. Do not copy any existing product photography. Produce an original composition."
+    }
+  ]
+}
