@@ -17,6 +17,25 @@ export type AdminProductListFilters = {
 
 const PAGE_SIZE = ADMIN_PRODUCTS_PAGE_SIZE;
 
+const adminProductListInclude = {
+    images: {
+        where: { origin: "ai_generated" as const },
+        select: { id: true, status: true },
+    },
+} satisfies Prisma.ProductInclude;
+
+export type AdminProductListItem = Prisma.ProductGetPayload<{
+    include: typeof adminProductListInclude;
+}>;
+
+export type AdminProductListResult = {
+    items: AdminProductListItem[];
+    total: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+};
+
 function parsePage(value: number | undefined): number {
     if (!value || !Number.isFinite(value) || value < 1) return 1;
     return Math.floor(value);
@@ -120,7 +139,9 @@ export function parseFiltersFromSearchParams(
     };
 }
 
-export async function listAdminProducts(filters: AdminProductListFilters) {
+export async function listAdminProducts(
+    filters: AdminProductListFilters,
+): Promise<AdminProductListResult> {
     const page = parsePage(filters.page);
     const where = buildProductListWhere(filters);
 
@@ -130,12 +151,7 @@ export async function listAdminProducts(filters: AdminProductListFilters) {
             orderBy: { name: "asc" },
             skip: (page - 1) * PAGE_SIZE,
             take: PAGE_SIZE,
-            include: {
-                images: {
-                    where: { origin: "ai_generated" },
-                    select: { id: true, status: true },
-                },
-            },
+            include: adminProductListInclude,
         }),
         db.product.count({ where }),
     ]);

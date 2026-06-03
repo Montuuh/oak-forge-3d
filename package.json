@@ -5,7 +5,8 @@
     "scripts": {
         "dev": "next dev",
         "dev:clean": "node -e \"require('fs').rmSync('.next',{recursive:true,force:true})\" && next dev",
-        "build": "next build",
+        "build": "prisma generate && next build",
+        "postinstall": "prisma generate",
         "start": "next start",
         "lint": "next lint",
         "sync": "tsx scripts/sync-catalog.ts",

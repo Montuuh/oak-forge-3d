@@ -5,6 +5,7 @@ import {
     getImageStatusSummary,
     listAdminProducts,
     parseFiltersFromSearchParams,
+    type AdminProductListResult,
 } from "@/lib/admin-product-queries";
 import { getPilotSlugs } from "@/lib/ai-image-queue-file";
 
@@ -50,7 +51,7 @@ export default async function AdminProductsPage({ searchParams = {} }: AdminProd
     const filters = parseFiltersFromSearchParams(searchParams);
     const pilotSlugs = new Set(getPilotSlugs());
 
-    let result: Awaited<ReturnType<typeof listAdminProducts>> | null = null;
+    let result: AdminProductListResult | null = null;
     let loadError: string | null = null;
 
     try {
