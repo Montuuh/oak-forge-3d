@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "last_updated": "2026-06-03T01:10:06.807Z",
+  "last_updated": "2026-06-03T01:16:07.125Z",
   "total_products": 219,
   "products": [
     {
@@ -146,7 +146,7 @@
       "print_time": "5:05",
       "print_time_seconds": 0,
       "weight_grams": 93.65,
-      "image_path": "https://mtwoaurffdknviwsholc.supabase.co/storage/v1/object/public/product-images/0004-charmander/cmpxdd3y10002esdxo0mlujyk.png",
+      "image_path": "https://mtwoaurffdknviwsholc.supabase.co/storage/v1/object/public/product-images/0004-charmander/cmpxdkmrx0004esdx58hq49e2.png",
       "n3d_url": "https://n3dmelbourne.com/designs/0004-charmander",
       "last_synced": "2026-02-03T13:56:36.511Z",
       "pokemon_name": "charmander",
@@ -159,10 +159,10 @@
         "status": "approved",
         "source_model": "vertex-gemini:gemini-2.5-flash-image",
         "prompt_version": "v6-local-shape-n3d-color",
-        "generated_at": "2026-06-03T01:09:58.969Z",
-        "reviewed_at": "2026-06-03T01:10:06.806Z",
+        "generated_at": "2026-06-03T01:15:49.965Z",
+        "reviewed_at": "2026-06-03T01:16:07.124Z",
         "reviewed_by": "dmont",
-        "approved_image_path": "https://mtwoaurffdknviwsholc.supabase.co/storage/v1/object/public/product-images/0004-charmander/cmpxdd3y10002esdxo0mlujyk.png"
+        "approved_image_path": "https://mtwoaurffdknviwsholc.supabase.co/storage/v1/object/public/product-images/0004-charmander/cmpxdkmrx0004esdx58hq49e2.png"
       },
       "image_source": "ai-generated"
     },

@@ -1,8 +1,10 @@
-import { getAllProducts, formatPrintTime, formatWeight } from "@/lib/products";
+import { getAllProducts } from "@/lib/products";
 import CatalogSection from "@/components/CatalogSection";
 
-export default function Home() {
-    const products = getAllProducts();
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+    const products = await getAllProducts();
     const characterProducts = products.filter(p => p.category === 'character');
     const standardProducts = products.filter(p => p.category === 'standard');
 

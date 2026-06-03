@@ -1,121 +1,54 @@
-/**
- * Public catalog data access layer.
- * Reads from data/catalog-public.json (exported from admin DB).
- */
+import "server-only";
 
-import { CATALOG_PLACEHOLDER_IMAGE_PATH, hasCatalogImage } from '@/lib/catalog-image';
-import { Product, ProductsData, ProductCategory } from '@/types/product';
-import catalogData from '@/data/catalog-public.json';
+import {
+    filterVisibleCatalogProducts,
+    getPublicCatalogData,
+} from "@/lib/catalog-public-source";
+import type { Product, ProductCategory } from "@/types/product";
 
-const data = catalogData as ProductsData;
-
-function isVisibleInCatalog(product: Product): boolean {
-    return product.visible_in_catalog !== false;
+export async function getAllProducts(): Promise<Product[]> {
+    const data = await getPublicCatalogData();
+    return filterVisibleCatalogProducts(data.products);
 }
 
-function getCatalogProducts(): Product[] {
-    return data.products.filter(isVisibleInCatalog);
-}
-
-/**
- * Get all products visible on the public catalog
- */
-export function getAllProducts(): Product[] {
-    return getCatalogProducts();
-}
-
-/**
- * Get products filtered by category
- */
-export function getProductsByCategory(category: ProductCategory): Product[] {
-    const products = getCatalogProducts();
-    if (category === 'all') {
+export async function getProductsByCategory(category: ProductCategory): Promise<Product[]> {
+    const products = await getAllProducts();
+    if (category === "all") {
         return products;
     }
-    return products.filter(p => p.category === category);
+    return products.filter((p) => p.category === category);
 }
 
-/**
- * Get a single product by slug
- */
-export function getProductBySlug(slug: string): Product | undefined {
-    return getCatalogProducts().find(p => p.slug === slug);
+export async function getProductBySlug(slug: string): Promise<Product | undefined> {
+    const products = await getAllProducts();
+    return products.find((p) => p.slug === slug);
 }
 
-/**
- * Get all product slugs (for static generation)
- */
-export function getAllProductSlugs(): string[] {
-    return getCatalogProducts().map(p => p.slug);
+export async function getAllProductSlugs(): Promise<string[]> {
+    const products = await getAllProducts();
+    return products.map((p) => p.slug);
 }
 
-/**
- * Get featured products
- */
-export function getFeaturedProducts(): Product[] {
-    return getCatalogProducts().filter(p => p.featured === true);
+export async function getFeaturedProducts(): Promise<Product[]> {
+    const products = await getAllProducts();
+    return products.filter((p) => p.featured === true);
 }
 
-/**
- * Get available products only
- */
-export function getAvailableProducts(): Product[] {
-    return getCatalogProducts().filter(p => p.available !== false);
+export async function getAvailableProducts(): Promise<Product[]> {
+    const products = await getAllProducts();
+    return products.filter((p) => p.available !== false);
 }
 
-/**
- * Get catalog metadata
- */
-export function getCatalogInfo(): {
+export async function getCatalogInfo(): Promise<{
     version: string;
     lastUpdated: string;
     totalProducts: number;
-} {
-    const products = getCatalogProducts();
+}> {
+    const data = await getPublicCatalogData();
+    const products = filterVisibleCatalogProducts(data.products);
     return {
         version: data.version,
         lastUpdated: data.last_updated,
         totalProducts: products.length,
     };
 }
-
-/**
- * Format print time for display
- */
-export function formatPrintTime(time: string): string {
-    const parts = time.split(':');
-    if (parts.length === 3) {
-        const hours = parseInt(parts[0], 10);
-        const minutes = parseInt(parts[1], 10);
-        if (hours > 0) {
-            return `${hours}h ${minutes}m`;
-        }
-        return `${minutes}m`;
-    }
-    return time;
-}
-
-/**
- * Format weight for display
- */
-export function formatWeight(grams: number): string {
-    if (grams >= 1000) {
-        return `${(grams / 1000).toFixed(1)}kg`;
-    }
-    return `${Math.round(grams)}g`;
-}
-
-/**
- * Ruta de imagen para el catalogo publico (primary o placeholder PND).
- */
-export function resolveProductImagePath(product: Product): string {
-    if (hasCatalogImage(product.image_path)) {
-        return product.image_path;
-    }
-    if (product.ai_asset?.status === 'approved' && product.ai_asset.approved_image_path) {
-        return product.ai_asset.approved_image_path;
-    }
-    return CATALOG_PLACEHOLDER_IMAGE_PATH;
-}
-
-export { hasCatalogImage, CATALOG_PLACEHOLDER_IMAGE_PATH };

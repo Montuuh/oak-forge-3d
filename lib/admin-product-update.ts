@@ -1,4 +1,5 @@
 import { ProductStatus } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { PRODUCT_STATUS_OPTIONS } from "@/lib/admin-product-constants";
 
@@ -72,6 +73,14 @@ export async function updateAdminProduct(input: AdminProductUpdateInput): Promis
         throw new Error("El nombre es obligatorio.");
     }
 
+    const existing = await db.product.findUnique({
+        where: { id: input.id },
+        select: { slug: true },
+    });
+    if (!existing) {
+        throw new Error("Producto no encontrado.");
+    }
+
     await db.product.update({
         where: { id: input.id },
         data: {
@@ -94,4 +103,7 @@ export async function updateAdminProduct(input: AdminProductUpdateInput): Promis
             isVisibleInCatalog: input.isVisibleInCatalog,
         },
     });
+
+    revalidatePath("/");
+    revalidatePath(`/products/${existing.slug}`);
 }

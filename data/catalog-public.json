@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
-  "last_updated": "2026-06-03T00:19:09.488Z",
-  "total_products": 1,
+  "last_updated": "2026-06-03T01:16:17.715Z",
+  "total_products": 5,
   "products": [
     {
       "id": "0001-bulbasaur",
@@ -24,11 +24,122 @@
       "featured": false,
       "available": true,
       "visible_in_catalog": true,
-      "last_synced": "2026-06-03T00:18:55.206Z",
+      "last_synced": "2026-06-03T00:19:33.328Z",
       "image_source": "ai-generated",
       "ai_asset": {
         "status": "approved",
         "approved_image_path": "https://mtwoaurffdknviwsholc.supabase.co/storage/v1/object/public/product-images/0001-bulbasaur/cmpxbhnmz000098dxyqett30f.png"
+      }
+    },
+    {
+      "id": "0001-bulbasaur-christmas",
+      "slug": "0001-bulbasaur-christmas",
+      "name": "0001 - Bulbasaur - Christmas",
+      "category": "character",
+      "tags": [],
+      "print_time": "6:58:07",
+      "print_time_seconds": 0,
+      "weight_grams": 150.89,
+      "pokemon_name": "bulbasaur",
+      "pokedex_number": 1,
+      "pokemon_types": [
+        "grass",
+        "poison"
+      ],
+      "image_path": "https://mtwoaurffdknviwsholc.supabase.co/storage/v1/object/public/product-images/0001-bulbasaur-christmas/cmpxbxk8u000498dx6zlsf8b5.png",
+      "n3d_url": "https://n3dmelbourne.com/designs/0001-bulbasaur-christmas",
+      "custom_description": "BULBASAUR can be seen napping in bright sunlight. There is a seed on its back. By soaking up the sun’s rays, the seed grows progressively larger.",
+      "featured": false,
+      "available": true,
+      "visible_in_catalog": true,
+      "last_synced": "2026-06-03T00:30:19.956Z",
+      "image_source": "ai-generated",
+      "ai_asset": {
+        "status": "approved",
+        "approved_image_path": "https://mtwoaurffdknviwsholc.supabase.co/storage/v1/object/public/product-images/0001-bulbasaur-christmas/cmpxbxk8u000498dx6zlsf8b5.png"
+      }
+    },
+    {
+      "id": "0002-ivysaur",
+      "slug": "0002-ivysaur",
+      "name": "0002 - Ivysaur",
+      "category": "character",
+      "tags": [],
+      "print_time": "7:17",
+      "print_time_seconds": 0,
+      "weight_grams": 117.66,
+      "pokemon_name": "ivysaur",
+      "pokedex_number": 2,
+      "pokemon_types": [
+        "grass",
+        "poison"
+      ],
+      "image_path": "https://mtwoaurffdknviwsholc.supabase.co/storage/v1/object/public/product-images/0002-ivysaur/cmpxcsbkl000248dx9j9b4sy9.png",
+      "n3d_url": "https://n3dmelbourne.com/designs/0002-ivysaur",
+      "custom_description": "There is a bud on this character’s back. To support its weight, IVYSAUR’s legs and trunk grow thick and strong. If it starts spending more time lying in the sunlight, it’s a sign that the bud will bloom into a large flower soon.",
+      "featured": false,
+      "available": true,
+      "visible_in_catalog": true,
+      "last_synced": "2026-06-03T00:54:36.186Z",
+      "image_source": "ai-generated",
+      "ai_asset": {
+        "status": "approved",
+        "approved_image_path": "https://mtwoaurffdknviwsholc.supabase.co/storage/v1/object/public/product-images/0002-ivysaur/cmpxcsbkl000248dx9j9b4sy9.png"
+      }
+    },
+    {
+      "id": "0003-venusaur",
+      "slug": "0003-venusaur",
+      "name": "0003 - Venusaur",
+      "category": "character",
+      "tags": [],
+      "print_time": "6:54",
+      "print_time_seconds": 0,
+      "weight_grams": 119.69,
+      "pokemon_name": "venusaur",
+      "pokedex_number": 3,
+      "pokemon_types": [
+        "grass",
+        "poison"
+      ],
+      "image_path": "https://mtwoaurffdknviwsholc.supabase.co/storage/v1/object/public/product-images/0003-venusaur/cmpxd9tmp0000scdx4i2usr1m.png",
+      "n3d_url": "https://n3dmelbourne.com/designs/0003-venusaur",
+      "custom_description": "There is a large flower on VENUSAUR’s back. The flower is said to take on vivid colors if it gets plenty of nutrition and sunlight. The flower’s aroma soothes the emotions of people.",
+      "featured": false,
+      "available": true,
+      "visible_in_catalog": true,
+      "last_synced": "2026-06-03T01:09:11.102Z",
+      "image_source": "ai-generated",
+      "ai_asset": {
+        "status": "approved",
+        "approved_image_path": "https://mtwoaurffdknviwsholc.supabase.co/storage/v1/object/public/product-images/0003-venusaur/cmpxd9tmp0000scdx4i2usr1m.png"
+      }
+    },
+    {
+      "id": "0004-charmander",
+      "slug": "0004-charmander",
+      "name": "0004 - Charmander",
+      "category": "character",
+      "tags": [],
+      "print_time": "5:05",
+      "print_time_seconds": 0,
+      "weight_grams": 93.65,
+      "pokemon_name": "charmander",
+      "pokedex_number": 4,
+      "pokemon_types": [
+        "fire"
+      ],
+      "image_path": "https://mtwoaurffdknviwsholc.supabase.co/storage/v1/object/public/product-images/0004-charmander/cmpxdkmrx0004esdx58hq49e2.png",
+      "n3d_url": "https://n3dmelbourne.com/designs/0004-charmander",
+      "custom_description": "The flame that burns at the tip of its tail is an indication of its emotions. The flame wavers when CHARMANDER is enjoying itself. If the character becomes enraged, the flame burns fiercely.",
+      "featured": false,
+      "available": true,
+      "visible_in_catalog": true,
+      "last_synced": "2026-06-03T01:16:07.007Z",
+      "image_source": "ai-generated",
+      "ai_asset": {
+        "status": "approved",
+        "approved_image_path": "https://mtwoaurffdknviwsholc.supabase.co/storage/v1/object/public/product-images/0004-charmander/cmpxdkmrx0004esdx58hq49e2.png"
       }
     }
   ]

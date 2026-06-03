@@ -2,22 +2,18 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { CatalogProductImage } from "@/components/CatalogProductImage";
 import { hasCatalogImage } from "@/lib/catalog-image";
-import { getAllProductSlugs, getProductBySlug, formatPrintTime, formatWeight, resolveProductImagePath } from "@/lib/products";
+import { formatPrintTime, formatWeight, resolveProductImagePath } from "@/lib/product-display";
+import { getProductBySlug } from "@/lib/products";
 import type { Metadata } from "next";
 
 interface PageProps {
     params: { slug: string };
 }
 
-// Generate static pages at build time
-export async function generateStaticParams() {
-    const slugs = getAllProductSlugs();
-    return slugs.map((slug) => ({ slug }));
-}
+export const dynamic = "force-dynamic";
 
-// Dynamic metadata
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-    const product = getProductBySlug(params.slug);
+    const product = await getProductBySlug(params.slug);
 
     if (!product) {
         return {
@@ -39,8 +35,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
 }
 
-export default function ProductPage({ params }: PageProps) {
-    const product = getProductBySlug(params.slug);
+export default async function ProductPage({ params }: PageProps) {
+    const product = await getProductBySlug(params.slug);
 
     if (!product) {
         notFound();

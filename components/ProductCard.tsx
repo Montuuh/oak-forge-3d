@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { CatalogProductImage } from "@/components/CatalogProductImage";
 import { Product } from "@/types/product";
-import { formatPrintTime, formatWeight, resolveProductImagePath } from "@/lib/products";
+import { formatPrintTime, formatWeight, resolveProductImagePath } from "@/lib/product-display";
 import { useFavorites } from "@/contexts/FavoritesContext";
 
 interface ProductCardProps {

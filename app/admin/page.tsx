@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AdminCatalogExport } from "@/components/admin/AdminCatalogExport";
 
 export const dynamic = "force-dynamic";
 
@@ -12,25 +13,23 @@ export default function AdminPage() {
                             Admin Console
                         </h1>
                         <p className="text-zinc-400">
-                            Base administrativa inicial para gestionar el catalogo de Oak&apos;s Forge 3D.
-                            En el siguiente paso conectaremos autenticacion de propietario y CRUD de productos.
+                            Gestiona productos, referencias N3D/locales, candidatos AI y visibilidad
+                            del catalogo publico. En produccion el sitio lee productos visibles desde
+                            la base de datos.
                         </p>
                     </div>
 
                     <div className="glass rounded-2xl p-6">
-                        <h2 className="text-xl font-semibold mb-4">Roadmap (fase actual)</h2>
-                        <ul className="space-y-2 text-zinc-300">
-                            <li>1. Base de datos (Prisma + Postgres)</li>
-                            <li>2. Login de propietario</li>
-                            <li>3. Estados de producto y visibilidad</li>
-                            <li>4. Pool de imagenes y aprobacion AI</li>
-                            <li>5. Export manual de catalogo publico</li>
-                        </ul>
+                        <h2 className="text-xl font-semibold mb-4">Prioridad inmediata</h2>
+                        <p className="text-sm text-zinc-300">
+                            Consistencia de escena AI: misma mesa roble y pared gotelé en todas las
+                            fotos generadas (pendiente de implementar).
+                        </p>
                     </div>
 
                     <div className="glass rounded-2xl p-6">
                         <h2 className="text-xl font-semibold mb-4">Acciones</h2>
-                        <div className="flex flex-wrap gap-3">
+                        <div className="flex flex-wrap items-start gap-3">
                             <Link
                                 href="/admin/products"
                                 className="rounded-xl bg-oak-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-oak-500"
@@ -43,6 +42,7 @@ export default function AdminPage() {
                             >
                                 Revision imagenes (piloto)
                             </Link>
+                            <AdminCatalogExport compact />
                         </div>
                     </div>
 

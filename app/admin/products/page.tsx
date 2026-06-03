@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Suspense } from "react";
+import { AdminCatalogExport } from "@/components/admin/AdminCatalogExport";
 import { AdminProductFilters } from "@/components/admin/AdminProductFilters";
 import {
     getImageStatusSummary,
@@ -73,10 +74,13 @@ export default async function AdminProductsPage({ searchParams = {} }: AdminProd
                 <div className="mb-6 max-w-3xl">
                     <h1 className="font-display text-3xl font-bold">Productos</h1>
                     <p className="mt-2 text-zinc-400">
-                        Selecciona un producto para editar datos, imagenes AI y visibilidad en el
-                        catalogo. Exportacion:{" "}
-                        <code className="text-zinc-300">npm run catalog:export</code>.
+                        Selecciona un producto para editar datos, imagenes AI y visibilidad. El sitio
+                        en Vercel muestra productos visibles desde la BD; exporta JSON para respaldo
+                        o commit.
                     </p>
+                    <div className="mt-4">
+                        <AdminCatalogExport />
+                    </div>
                 </div>
 
                 {flash === "saved" && (

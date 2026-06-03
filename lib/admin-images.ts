@@ -1,4 +1,5 @@
 import { getAdminReviewerName } from "@/lib/admin-reviewer";
+import { revalidatePath } from "next/cache";
 import { buildLifestyleImagePrompt, getDefaultPromptVersion, pickLifestyleCameraYawDegrees, resolvePromptVersion } from "@/lib/ai-image-prompt";
 import {
     findQueueEntry,
@@ -539,6 +540,11 @@ export async function approveProductImage(imageId: string) {
         });
     } else if (image.origin === "real_photo") {
         syncProductsJsonOnApproveLocal(image.product.slug, image.imagePath);
+    }
+
+    if (image.product.isVisibleInCatalog) {
+        revalidatePath("/");
+        revalidatePath(`/products/${image.product.slug}`);
     }
 
     return db.productImage.findUnique({
