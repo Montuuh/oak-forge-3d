@@ -1,7 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
+import { CatalogProductImage } from "@/components/CatalogProductImage";
 import { Product } from "@/types/product";
 import { formatPrintTime, formatWeight, resolveProductImagePath } from "@/lib/products";
 import { useFavorites } from "@/contexts/FavoritesContext";
@@ -34,10 +34,9 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
             <article className="glass rounded-2xl overflow-hidden hover-lift card-border h-full flex flex-col animate-in">
                 {/* Image */}
                 <div className="relative aspect-square overflow-hidden bg-dark-900">
-                    <Image
+                    <CatalogProductImage
                         src={imagePath}
                         alt={product.name}
-                        fill
                         className="object-cover transition-transform duration-500 group-hover:scale-110"
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                     />

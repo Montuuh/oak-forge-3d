@@ -1,184 +1,197 @@
-import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
-import { db } from "@/lib/db";
-import type { ProductStatus } from "@prisma/client";
+import Link from "next/link";
+import { Suspense } from "react";
+import { AdminProductFilters } from "@/components/admin/AdminProductFilters";
+import {
+    getImageStatusSummary,
+    listAdminProducts,
+    parseFiltersFromSearchParams,
+} from "@/lib/admin-product-queries";
+import { getPilotSlugs } from "@/lib/ai-image-queue-file";
 
 export const dynamic = "force-dynamic";
 
-const PRODUCT_STATES: ProductStatus[] = ["draft", "in_review", "published", "archived"];
+const IMAGE_LABEL = {
+    approved: "AI aprobada",
+    candidates: "Candidatos",
+    none: "Sin AI",
+    rejected_only: "Solo rechazadas",
+} as const;
 
-async function updateProduct(formData: FormData) {
-    "use server";
+const STATUS_BADGE: Record<string, string> = {
+    draft: "bg-zinc-500/20 text-zinc-300",
+    in_review: "bg-amber-500/20 text-amber-100",
+    published: "bg-emerald-500/20 text-emerald-200",
+    archived: "bg-red-500/20 text-red-200",
+};
 
-    const id = String(formData.get("id") || "");
-    const status = String(formData.get("status") || "draft") as ProductStatus;
-    const category = String(formData.get("category") || "character");
-    const shortDescription = String(formData.get("shortDescription") || "").trim();
-    const priceRaw = String(formData.get("priceCents") || "").trim();
-    const wantsVisibleInCatalog = formData.get("isVisibleInCatalog") === "on";
-
-    if (!id) return;
-    if (!PRODUCT_STATES.includes(status)) return;
-
-    if (wantsVisibleInCatalog) {
-        const approvedCount = await db.productImage.count({
-            where: { productId: id, status: "approved" },
-        });
-        if (approvedCount === 0) {
-            redirect("/admin/products?error=visibility_requires_image");
-        }
-    }
-
-    await db.product.update({
-        where: { id },
-        data: {
-            status,
-            category,
-            isVisibleInCatalog: wantsVisibleInCatalog,
-            shortDescription: shortDescription || null,
-            priceCents: priceRaw ? Number(priceRaw) : null,
-        },
-    });
-
-    revalidatePath("/admin/products");
-    redirect("/admin/products?saved=1");
+function buildListQuery(
+    filters: ReturnType<typeof parseFiltersFromSearchParams>,
+    overrides: Record<string, string | number>,
+): string {
+    const params = new URLSearchParams();
+    if (filters.q) params.set("q", filters.q);
+    if (filters.status) params.set("status", filters.status);
+    if (filters.category) params.set("category", filters.category);
+    if (filters.visibility) params.set("visibility", filters.visibility);
+    if (filters.image) params.set("image", filters.image);
+    if (filters.pilot) params.set("pilot", filters.pilot);
+    if (filters.featured) params.set("featured", filters.featured);
+    if (filters.available) params.set("available", filters.available);
+    Object.entries(overrides).forEach(([k, v]) => params.set(k, String(v)));
+    const s = params.toString();
+    return s ? `?${s}` : "";
 }
 
 interface AdminProductsPageProps {
-    searchParams?: { error?: string; saved?: string };
+    searchParams?: Record<string, string | string[] | undefined>;
 }
 
-export default async function AdminProductsPage({ searchParams }: AdminProductsPageProps) {
-    let products: Awaited<ReturnType<typeof db.product.findMany>> = [];
+export default async function AdminProductsPage({ searchParams = {} }: AdminProductsPageProps) {
+    const filters = parseFiltersFromSearchParams(searchParams);
+    const pilotSlugs = new Set(getPilotSlugs());
+
+    let result: Awaited<ReturnType<typeof listAdminProducts>> | null = null;
     let loadError: string | null = null;
 
     try {
-        products = await db.product.findMany({
-            orderBy: { createdAt: "desc" },
-            take: 100,
-        });
+        result = await listAdminProducts(filters);
     } catch (error) {
         loadError =
             error instanceof Error
                 ? error.message
-                : "No se pudo cargar productos. Revisa DATABASE_URL y prisma db push.";
+                : "No se pudo cargar productos. Revisa DATABASE_URL.";
     }
+
+    const flash = typeof searchParams.saved === "string" ? "saved" : null;
+    const flashError =
+        typeof searchParams.error === "string" ? searchParams.error : null;
 
     return (
         <div className="py-8 md:py-12">
             <div className="container mx-auto px-4 md:px-6">
-                <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-                    <div>
-                        <h1 className="font-display text-3xl font-bold">Productos</h1>
-                        <p className="text-zinc-400">
-                            Marca &quot;Visible en catalogo&quot; solo cuando el producto tenga imagen aprobada.
-                            El sitio publico usa <code className="text-zinc-300">npm run catalog:export</code>.
-                        </p>
-                    </div>
+                <div className="mb-6 max-w-3xl">
+                    <h1 className="font-display text-3xl font-bold">Productos</h1>
+                    <p className="mt-2 text-zinc-400">
+                        Selecciona un producto para editar datos, imagenes AI y visibilidad en el
+                        catalogo. Exportacion:{" "}
+                        <code className="text-zinc-300">npm run catalog:export</code>.
+                    </p>
                 </div>
 
-                {searchParams?.error === "visibility_requires_image" && (
-                    <div className="mb-4 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-100">
-                        No se puede activar visibilidad publica sin al menos una imagen aprobada.
-                    </div>
-                )}
-                {searchParams?.saved === "1" && (
+                {flash === "saved" && (
                     <div className="mb-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-sm text-emerald-100">
                         Cambios guardados.
                     </div>
                 )}
 
+                <div className="mb-6">
+                    <Suspense fallback={<div className="h-32 animate-pulse rounded-2xl bg-white/5" />}>
+                        <AdminProductFilters />
+                    </Suspense>
+                </div>
+
                 {loadError ? (
                     <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200">
                         {loadError}
                     </div>
-                ) : products.length === 0 ? (
+                ) : !result || result.items.length === 0 ? (
                     <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-zinc-300">
-                        No hay productos en la base de datos todavia.
+                        No hay productos con estos filtros.
                     </div>
                 ) : (
-                    <div className="space-y-4">
-                        {products.map((product) => (
-                            <form
-                                key={product.id}
-                                action={updateProduct}
-                                className="glass rounded-2xl border border-white/10 p-4"
-                            >
-                                <input type="hidden" name="id" value={product.id} />
+                    <>
+                        <p className="mb-3 text-sm text-zinc-500">
+                            {result.total} producto(s) · pagina {result.page} de {result.totalPages}
+                        </p>
 
-                                <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-                                    <div>
-                                        <div className="font-semibold">{product.name}</div>
-                                        <div className="text-xs text-zinc-500">
-                                            slug: {product.slug}
-                                        </div>
-                                    </div>
-                                    <label className="inline-flex items-center gap-2 text-sm text-zinc-300">
-                                        <input
-                                            type="checkbox"
-                                            name="isVisibleInCatalog"
-                                            defaultChecked={product.isVisibleInCatalog}
-                                        />
-                                        Visible en catalogo publico
-                                    </label>
-                                </div>
+                        <div className="overflow-hidden rounded-2xl border border-white/10">
+                            <table className="w-full text-left text-sm">
+                                <thead className="bg-white/5 text-zinc-400">
+                                    <tr>
+                                        <th className="px-4 py-3 font-medium">Producto</th>
+                                        <th className="hidden px-4 py-3 font-medium md:table-cell">Estado</th>
+                                        <th className="hidden px-4 py-3 font-medium sm:table-cell">Imagen</th>
+                                        <th className="px-4 py-3 font-medium">Publico</th>
+                                        <th className="px-4 py-3 font-medium" />
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-white/5">
+                                    {result.items.map((product) => {
+                                        const imageSummary = getImageStatusSummary(product.images);
+                                        return (
+                                            <tr
+                                                key={product.id}
+                                                className="transition hover:bg-white/[0.03]"
+                                            >
+                                                <td className="px-4 py-3">
+                                                    <div className="font-medium text-zinc-100">
+                                                        {product.name}
+                                                    </div>
+                                                    <div className="text-xs text-zinc-500">
+                                                        {product.slug}
+                                                        {pilotSlugs.has(product.slug) && (
+                                                            <span className="ml-2 text-violet-300">
+                                                                piloto
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                                <td className="hidden px-4 py-3 md:table-cell">
+                                                    <span
+                                                        className={`rounded-full px-2 py-0.5 text-xs ${STATUS_BADGE[product.status] ?? ""}`}
+                                                    >
+                                                        {product.status}
+                                                    </span>
+                                                </td>
+                                                <td className="hidden px-4 py-3 text-zinc-400 sm:table-cell">
+                                                    {IMAGE_LABEL[imageSummary]}
+                                                </td>
+                                                <td className="px-4 py-3">
+                                                    {product.isVisibleInCatalog ? (
+                                                        <span className="text-emerald-300">Si</span>
+                                                    ) : (
+                                                        <span className="text-zinc-500">No</span>
+                                                    )}
+                                                </td>
+                                                <td className="px-4 py-3 text-right">
+                                                    <Link
+                                                        href={`/admin/products/${product.slug}`}
+                                                        className="rounded-lg bg-oak-600/90 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-oak-500"
+                                                    >
+                                                        Editar
+                                                    </Link>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
 
-                                <div className="grid gap-3 md:grid-cols-4">
-                                    <label className="text-sm">
-                                        <span className="mb-1 block text-zinc-400">Estado</span>
-                                        <select
-                                            name="status"
-                                            defaultValue={product.status}
-                                            className="w-full rounded-lg border border-white/10 bg-zinc-900/70 px-3 py-2"
-                                        >
-                                            {PRODUCT_STATES.map((state) => (
-                                                <option key={state} value={state}>
-                                                    {state}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </label>
-
-                                    <label className="text-sm">
-                                        <span className="mb-1 block text-zinc-400">Categoria</span>
-                                        <input
-                                            name="category"
-                                            defaultValue={product.category}
-                                            className="w-full rounded-lg border border-white/10 bg-zinc-900/70 px-3 py-2"
-                                        />
-                                    </label>
-
-                                    <label className="text-sm">
-                                        <span className="mb-1 block text-zinc-400">Precio (centimos)</span>
-                                        <input
-                                            type="number"
-                                            name="priceCents"
-                                            defaultValue={product.priceCents ?? ""}
-                                            className="w-full rounded-lg border border-white/10 bg-zinc-900/70 px-3 py-2"
-                                        />
-                                    </label>
-
-                                    <label className="text-sm md:col-span-1">
-                                        <span className="mb-1 block text-zinc-400">Descripcion corta</span>
-                                        <input
-                                            name="shortDescription"
-                                            defaultValue={product.shortDescription ?? ""}
-                                            className="w-full rounded-lg border border-white/10 bg-zinc-900/70 px-3 py-2"
-                                        />
-                                    </label>
-                                </div>
-
-                                <div className="mt-3">
-                                    <button
-                                        type="submit"
-                                        className="rounded-lg bg-oak-600 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-oak-500"
+                        {result.totalPages > 1 && (
+                            <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+                                {result.page > 1 && (
+                                    <Link
+                                        href={`/admin/products${buildListQuery(filters, { page: result.page - 1 })}`}
+                                        className="rounded-lg border border-white/15 px-3 py-1.5 text-sm text-zinc-300 hover:bg-white/10"
                                     >
-                                        Guardar cambios
-                                    </button>
-                                </div>
-                            </form>
-                        ))}
-                    </div>
+                                        Anterior
+                                    </Link>
+                                )}
+                                <span className="text-sm text-zinc-500">
+                                    {result.page} / {result.totalPages}
+                                </span>
+                                {result.page < result.totalPages && (
+                                    <Link
+                                        href={`/admin/products${buildListQuery(filters, { page: result.page + 1 })}`}
+                                        className="rounded-lg border border-white/15 px-3 py-1.5 text-sm text-zinc-300 hover:bg-white/10"
+                                    >
+                                        Siguiente
+                                    </Link>
+                                )}
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
         </div>

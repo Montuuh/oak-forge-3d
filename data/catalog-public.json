@@ -1,6 +1,35 @@
 {
   "version": "1.0.0",
-  "last_updated": "2026-06-02T15:46:42.144Z",
-  "total_products": 0,
-  "products": []
+  "last_updated": "2026-06-03T00:19:09.488Z",
+  "total_products": 1,
+  "products": [
+    {
+      "id": "0001-bulbasaur",
+      "slug": "0001-bulbasaur",
+      "name": "0001 - Bulbasaur",
+      "category": "character",
+      "tags": [],
+      "print_time": "4:20:37",
+      "print_time_seconds": 0,
+      "weight_grams": 87,
+      "pokemon_name": "bulbasaur",
+      "pokedex_number": 1,
+      "pokemon_types": [
+        "grass",
+        "poison"
+      ],
+      "image_path": "https://mtwoaurffdknviwsholc.supabase.co/storage/v1/object/public/product-images/0001-bulbasaur/cmpxbhnmz000098dxyqett30f.png",
+      "n3d_url": "https://n3dmelbourne.com/designs/0001-bulbasaur",
+      "custom_description": "BULBASAUR can be seen napping in bright sunlight. There is a seed on its back. By soaking up the sun’s rays, the seed grows progressively larger.",
+      "featured": false,
+      "available": true,
+      "visible_in_catalog": true,
+      "last_synced": "2026-06-03T00:18:55.206Z",
+      "image_source": "ai-generated",
+      "ai_asset": {
+        "status": "approved",
+        "approved_image_path": "https://mtwoaurffdknviwsholc.supabase.co/storage/v1/object/public/product-images/0001-bulbasaur/cmpxbhnmz000098dxyqett30f.png"
+      }
+    }
+  ]
 }

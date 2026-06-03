@@ -3,6 +3,7 @@
  * Reads from data/catalog-public.json (exported from admin DB).
  */
 
+import { CATALOG_PLACEHOLDER_IMAGE_PATH, hasCatalogImage } from '@/lib/catalog-image';
 import { Product, ProductsData, ProductCategory } from '@/types/product';
 import catalogData from '@/data/catalog-public.json';
 
@@ -105,13 +106,16 @@ export function formatWeight(grams: number): string {
 }
 
 /**
- * Resolve the display image path for a product.
- * Prefers approved AI assets and falls back to the default image.
+ * Ruta de imagen para el catalogo publico (primary o placeholder PND).
  */
 export function resolveProductImagePath(product: Product): string {
+    if (hasCatalogImage(product.image_path)) {
+        return product.image_path;
+    }
     if (product.ai_asset?.status === 'approved' && product.ai_asset.approved_image_path) {
         return product.ai_asset.approved_image_path;
     }
-
-    return product.image_path;
+    return CATALOG_PLACEHOLDER_IMAGE_PATH;
 }
+
+export { hasCatalogImage, CATALOG_PLACEHOLDER_IMAGE_PATH };

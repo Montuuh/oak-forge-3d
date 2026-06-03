@@ -1,33 +1,55 @@
 {
   "version": "1.0.0",
-  "generated_at": "2026-06-02T12:36:13.405Z",
+  "generated_at": "2026-06-03T01:10:06.806Z",
   "total_items": 10,
   "items": [
     {
       "slug": "0001-bulbasaur",
       "product_name": "0001 - Bulbasaur",
-      "status": "pending_generation",
-      "prompt_version": "v1-lifestyle-real-print",
+      "status": "generated_pending_review",
+      "prompt_version": "v5-color-geometry-split",
       "style": "lifestyle_scene",
       "requested_candidates": 5,
-      "candidates": [],
-      "notes": "Generate a photorealistic lifestyle photo of a 3D printed decorative Pokeball-inspired collectible. Product name: 0001 - Bulbasaur. Category: character. The object must look like a real PLA print: subtle layer lines, realistic lighting, physically plausible reflections, no warping. Scene: premium desk/shelf lifestyle setup, shallow depth of field, no text overlays, no logos, no watermarks. Do not copy any existing product photography. Produce an original composition."
+      "candidates": [
+        {
+          "id": "cmpxbhnmz000098dxyqett30f",
+          "image_path": "https://mtwoaurffdknviwsholc.supabase.co/storage/v1/object/public/product-images/0001-bulbasaur/cmpxbhnmz000098dxyqett30f.png",
+          "prompt": "Role: Expert in clean, premium e-commerce product photography and technical color grading.\nYou receive 2 reference image(s). Follow each role strictly.\nReference 1 (Subida manual): GEOMETRY — weight 1.0. Match silhouette, proportions, pose, and 3D form exactly. Do not copy its colors when a color reference is present.\nReference 2 (N3D / sync): COLOR — weight 1.0. Match hues, saturation, and material color exactly. Do not use for silhouette when a geometry reference is present.\n[SCENE — MINIMAL]\nEnvironment: continuous oak wood desk in the foreground, soft neutral gotelé wall in the back.\nNO props, NO accessories, NO extra objects on the desk — only the collectible and honest wood surface.\nCamera: nearly front-facing with 9° horizontal yaw to the right (within ±15° from straight-on; no profile, no extreme 3/4). 50mm lens, f/2.8 aperture, eye-level, gentle background softness (wall only, not busy).\nComposition: keep the collectible readable from the front; only a slight turn for natural product photography.\n[POSITIVE PROMPT]\nA professional, simple, hyper-realistic product photograph of\nthe same decorative Pokéball-inspired 3D-printed PLA collectible:\nGEOMETRY reference(s) define silhouette, proportions, and 3D form (Bulbasaur Pokéball hybrid).\nCOLOR reference (N3D render) defines hues, saturation, and material color — do not copy its background, props, or watermark.\nDo NOT reinterpret as a full standing Pokémon figure.\nRe-stage only: clean oak desk, plain gotelé wall; remove watermark, plants, and original props.\nMatte PLA, VERY SUBTLE fine 0.12mm HORIZONTAL layer lines on the spherical collectible.\nCentered or rule-of-thirds composition; the collectible is the sole hero subject.\nContinuous oak desk visible between camera and object; soft natural daylight from the left.\nNeutral color temperature; soft contact shadow on the desk.\n[NEGATIVE PROMPT]\nfull standing pokemon figure, bipedal figurine, plush toy, action figure, different silhouette than reference, non-spherical shape, generic bulbasaur fan art, monochrome gray or palette that contradicts the color reference,\nprofile view, extreme three-quarter angle, 45 degree rotation, 90 degree side view, top-down, bird's eye, Dutch angle, worm's eye,\ndesk props, game consoles, game cases, tools, plants, filament spools, keychains, glasses, cluttered background, busy scene, floating object, object on cliff edge, flat catalog render, CGI illustration, hands, watermark, N3D logo, wrong colors vs color reference, wrong shape vs geometry reference, neon oversaturation, vertical layer lines, thick layer lines, deep grooves, toy gloss plastic\nProduct: 0001 - Bulbasaur (character).\nCamera yaw: 9°",
+          "model": "vertex-gemini:gemini-2.5-flash-image",
+          "generated_at": "2026-06-03T00:17:31.883Z"
+        }
+      ],
+      "notes": "Generate a photorealistic lifestyle photo of a 3D printed decorative Pokeball-inspired collectible. Product name: 0001 - Bulbasaur. Category: character. The object must look like a real PLA print: subtle layer lines, realistic lighting, physically plausible reflections, no warping. Scene: premium desk/shelf lifestyle setup, shallow depth of field, no text overlays, no logos, no watermarks. Do not copy any existing product photography. Produce an original composition.",
+      "reviewed_by": "dmont",
+      "reviewed_at": "2026-06-03T00:18:55.323Z",
+      "approved_candidate_id": "cmpxbhnmz000098dxyqett30f"
     },
     {
       "slug": "0001-bulbasaur-christmas",
       "product_name": "0001 - Bulbasaur - Christmas",
-      "status": "pending_generation",
-      "prompt_version": "v1-lifestyle-real-print",
+      "status": "approved",
+      "prompt_version": "v5-color-geometry-split",
       "style": "lifestyle_scene",
       "requested_candidates": 5,
-      "candidates": [],
-      "notes": "Generate a photorealistic lifestyle photo of a 3D printed decorative Pokeball-inspired collectible. Product name: 0001 - Bulbasaur - Christmas. Category: character. The object must look like a real PLA print: subtle layer lines, realistic lighting, physically plausible reflections, no warping. Scene: premium desk/shelf lifestyle setup, shallow depth of field, no text overlays, no logos, no watermarks. Do not copy any existing product photography. Produce an original composition."
+      "candidates": [
+        {
+          "id": "cmpxbxk8u000498dx6zlsf8b5",
+          "image_path": "https://mtwoaurffdknviwsholc.supabase.co/storage/v1/object/public/product-images/0001-bulbasaur-christmas/cmpxbxk8u000498dx6zlsf8b5.png",
+          "prompt": "Role: Expert in clean, premium e-commerce product photography and technical color grading.\nYou receive 1 reference image(s). Follow each role strictly.\nReference 1 (N3D / sync (protegida)): COLOR — weight 1.0. Match hues, saturation, and material color exactly. Do not use for silhouette when a geometry reference is present.\n[SCENE — MINIMAL]\nEnvironment: continuous oak wood desk in the foreground, soft neutral gotelé wall in the back.\nNO props, NO accessories, NO extra objects on the desk — only the collectible and honest wood surface.\nCamera: nearly front-facing with 1° horizontal yaw to the right (within ±15° from straight-on; no profile, no extreme 3/4). 50mm lens, f/2.8 aperture, eye-level, gentle background softness (wall only, not busy).\nComposition: keep the collectible readable from the front; only a slight turn for natural product photography.\n[POSITIVE PROMPT]\nA professional, simple, hyper-realistic product photograph of\nthe EXACT SAME decorative Pokéball-inspired 3D-printed PLA collectible shown in the COLOR reference (N3D):\nspherical Pokéball hybrid form with Bulbasaur styling (bulb, ears, spots, colors).\nCopy shape and colors from the N3D reference faithfully — do NOT reinterpret as a full standing Pokémon figure.\nRe-stage only: clean oak desk, plain gotelé wall; remove watermark, plants, and original props.\nMatte PLA, VERY SUBTLE fine 0.12mm HORIZONTAL layer lines on the spherical collectible.\nCentered or rule-of-thirds composition; the collectible is the sole hero subject.\nContinuous oak desk visible between camera and object; soft natural daylight from the left.\nNeutral color temperature; soft contact shadow on the desk.\n[NEGATIVE PROMPT]\nfull standing pokemon figure, bipedal figurine, plush toy, action figure, different silhouette than reference, non-spherical shape, generic bulbasaur fan art, monochrome gray or palette that contradicts the color reference,\nprofile view, extreme three-quarter angle, 45 degree rotation, 90 degree side view, top-down, bird's eye, Dutch angle, worm's eye,\ndesk props, game consoles, game cases, tools, plants, filament spools, keychains, glasses, cluttered background, busy scene, floating object, object on cliff edge, flat catalog render, CGI illustration, hands, watermark, N3D logo, wrong colors vs color reference, wrong shape vs geometry reference, neon oversaturation, vertical layer lines, thick layer lines, deep grooves, toy gloss plastic\nProduct: 0001 - Bulbasaur - Christmas (character).\nCamera yaw: 1°",
+          "model": "vertex-gemini:gemini-2.5-flash-image",
+          "generated_at": "2026-06-03T00:29:53.982Z"
+        }
+      ],
+      "notes": "Generate a photorealistic lifestyle photo of a 3D printed decorative Pokeball-inspired collectible. Product name: 0001 - Bulbasaur - Christmas. Category: character. The object must look like a real PLA print: subtle layer lines, realistic lighting, physically plausible reflections, no warping. Scene: premium desk/shelf lifestyle setup, shallow depth of field, no text overlays, no logos, no watermarks. Do not copy any existing product photography. Produce an original composition.",
+      "approved_candidate_id": "cmpxbxk8u000498dx6zlsf8b5",
+      "reviewed_by": "dmont",
+      "reviewed_at": "2026-06-03T00:30:02.510Z"
     },
     {
       "slug": "0001-bulbasaur-love",
       "product_name": "0001 - Bulbasaur - Love",
-      "status": "pending_generation",
-      "prompt_version": "v1-lifestyle-real-print",
+      "status": "generated_pending_review",
+      "prompt_version": "v5-color-geometry-split",
       "style": "lifestyle_scene",
       "requested_candidates": 5,
       "candidates": [],
@@ -36,38 +58,71 @@
     {
       "slug": "0002-ivysaur",
       "product_name": "0002 - Ivysaur",
-      "status": "pending_generation",
-      "prompt_version": "v1-lifestyle-real-print",
+      "status": "approved",
+      "prompt_version": "v5-color-geometry-split",
       "style": "lifestyle_scene",
       "requested_candidates": 5,
-      "candidates": [],
-      "notes": "Generate a photorealistic lifestyle photo of a 3D printed decorative Pokeball-inspired collectible. Product name: 0002 - Ivysaur. Category: character. The object must look like a real PLA print: subtle layer lines, realistic lighting, physically plausible reflections, no warping. Scene: premium desk/shelf lifestyle setup, shallow depth of field, no text overlays, no logos, no watermarks. Do not copy any existing product photography. Produce an original composition."
+      "candidates": [
+        {
+          "id": "cmpxcsbkl000248dx9j9b4sy9",
+          "image_path": "https://mtwoaurffdknviwsholc.supabase.co/storage/v1/object/public/product-images/0002-ivysaur/cmpxcsbkl000248dx9j9b4sy9.png",
+          "prompt": "Role: Expert in clean, premium e-commerce product photography and technical color grading.\nYou receive 2 reference image(s). Follow each role strictly.\nReference 1 (Busqueda web: Ivysaur Inspired Ball (craftyqco.com)): GEOMETRY — weight 1.0. Match silhouette, proportions, pose, and 3D form exactly. Do not copy its colors when a color reference is present.\nReference 2 (N3D / sync (protegida)): COLOR — weight 1.0. Match hues, saturation, and material color exactly. Do not use for silhouette when a geometry reference is present.\n[SCENE — MINIMAL]\nEnvironment: continuous oak wood desk in the foreground, soft neutral gotelé wall in the back.\nNO props, NO accessories, NO extra objects on the desk — only the collectible and honest wood surface.\nCamera: nearly front-facing with 5° horizontal yaw to the right (within ±15° from straight-on; no profile, no extreme 3/4). 50mm lens, f/2.8 aperture, eye-level, gentle background softness (wall only, not busy).\nComposition: keep the collectible readable from the front; only a slight turn for natural product photography.\n[POSITIVE PROMPT]\nA professional, simple, hyper-realistic product photograph of\nthe same decorative Pokéball-inspired 3D-printed PLA collectible:\nGEOMETRY reference(s) define silhouette, proportions, and 3D form (Ivysaur Pokéball hybrid).\nCOLOR reference (N3D render) defines hues, saturation, and material color — do not copy its background, props, or watermark.\nDo NOT reinterpret as a full standing Pokémon figure.\nRe-stage only: clean oak desk, plain gotelé wall; remove watermark, plants, and original props.\nMatte PLA, VERY SUBTLE fine 0.12mm HORIZONTAL layer lines on the spherical collectible.\nCentered or rule-of-thirds composition; the collectible is the sole hero subject.\nContinuous oak desk visible between camera and object; soft natural daylight from the left.\nNeutral color temperature; soft contact shadow on the desk.\n[NEGATIVE PROMPT]\nfull standing pokemon figure, bipedal figurine, plush toy, action figure, different silhouette than reference, non-spherical shape, generic bulbasaur fan art, monochrome gray or palette that contradicts the color reference,\nprofile view, extreme three-quarter angle, 45 degree rotation, 90 degree side view, top-down, bird's eye, Dutch angle, worm's eye,\ndesk props, game consoles, game cases, tools, plants, filament spools, keychains, glasses, cluttered background, busy scene, floating object, object on cliff edge, flat catalog render, CGI illustration, hands, watermark, N3D logo, wrong colors vs color reference, wrong shape vs geometry reference, neon oversaturation, vertical layer lines, thick layer lines, deep grooves, toy gloss plastic\nProduct: 0002 - Ivysaur (character).\nCamera yaw: 5°",
+          "model": "vertex-gemini:gemini-2.5-flash-image",
+          "generated_at": "2026-06-03T00:53:49.077Z"
+        }
+      ],
+      "notes": "Generate a photorealistic lifestyle photo of a 3D printed decorative Pokeball-inspired collectible. Product name: 0002 - Ivysaur. Category: character. The object must look like a real PLA print: subtle layer lines, realistic lighting, physically plausible reflections, no warping. Scene: premium desk/shelf lifestyle setup, shallow depth of field, no text overlays, no logos, no watermarks. Do not copy any existing product photography. Produce an original composition.",
+      "approved_candidate_id": "cmpxcsbkl000248dx9j9b4sy9",
+      "reviewed_by": "dmont",
+      "reviewed_at": "2026-06-03T00:54:24.673Z"
     },
     {
       "slug": "0003-venusaur",
       "product_name": "0003 - Venusaur",
-      "status": "pending_generation",
-      "prompt_version": "v1-lifestyle-real-print",
+      "status": "approved",
+      "prompt_version": "v6-local-shape-n3d-color",
       "style": "lifestyle_scene",
       "requested_candidates": 5,
-      "candidates": [],
-      "notes": "Generate a photorealistic lifestyle photo of a 3D printed decorative Pokeball-inspired collectible. Product name: 0003 - Venusaur. Category: character. The object must look like a real PLA print: subtle layer lines, realistic lighting, physically plausible reflections, no warping. Scene: premium desk/shelf lifestyle setup, shallow depth of field, no text overlays, no logos, no watermarks. Do not copy any existing product photography. Produce an original composition."
+      "candidates": [
+        {
+          "id": "cmpxd9tmp0000scdx4i2usr1m",
+          "image_path": "https://mtwoaurffdknviwsholc.supabase.co/storage/v1/object/public/product-images/0003-venusaur/cmpxd9tmp0000scdx4i2usr1m.png",
+          "prompt": "Role: Expert in clean, premium e-commerce product photography and technical color grading.\nYou receive 2 reference image(s). Follow each role strictly.\nReference 1 (Busqueda web: Pokémon-Inspired 3D Printed Poké Ball – Venusaur — Ready to Print 3D (readytoprint3d.com)): GEOMETRY (local) — shape weight 1.0, color weight ≤ 0.15. Match silhouette, proportions, pose, and 3D form exactly — this is the authoritative shape source. Do not copy its colors when an N3D color reference is present.\nReference 2 (N3D / sync (protegida)): COLOR (N3D) — palette weight 1.0, shape weight 0.0. Match hues, saturation, and material color exactly. Ignore N3D silhouette, proportions, and pose when a local geometry reference exists.\n[REFERENCE WEIGHTS — STRICT SPLIT]\nLocal GEOMETRY → silhouette, proportions, 3D form: weight 1.0 (authoritative).\nN3D COLOR → hues, saturation, PLA material color: weight 1.0 (authoritative).\nN3D shape / proportions: weight 0.0 — discard when local geometry is present.\nLocal photo colors: weight ≤ 0.15 — subtle print tone only; N3D palette always wins.\n[SCENE — MINIMAL]\nEnvironment: continuous oak wood desk in the foreground, soft neutral gotelé wall in the back.\nNO props, NO accessories, NO extra objects on the desk — only the collectible and honest wood surface.\nCamera: nearly front-facing with 1° horizontal yaw to the right (within ±15° from straight-on; no profile, no extreme 3/4). 50mm lens, f/2.8 aperture, eye-level, gentle background softness (wall only, not busy).\nComposition: keep the collectible readable from the front; only a slight turn for natural product photography.\n[POSITIVE PROMPT]\nA professional, simple, hyper-realistic product photograph of\nthe same decorative Pokéball-inspired 3D-printed PLA collectible:\nAUTHORITATIVE SHAPE — local GEOMETRY reference (weight 1.0): match its silhouette, proportions, feature placement, and 3D form exactly (Venusaur Pokéball hybrid).\nAUTHORITATIVE COLOR — N3D COLOR reference (weight 1.0): match its hues, saturation, and PLA material color exactly.\nN3D silhouette weight = 0 when local geometry exists — extract color only from N3D; ignore N3D shape, pose, and proportions.\nLocal photo color weight ≤ 0.15 — ambient print tone at most; never override the N3D palette.\nDo NOT reinterpret as a full standing Pokémon figure.\nRe-stage only: clean oak desk, plain gotelé wall; remove watermark, plants, and original props.\nMatte PLA, VERY SUBTLE fine 0.12mm HORIZONTAL layer lines on the spherical collectible.\nCentered or rule-of-thirds composition; the collectible is the sole hero subject.\nContinuous oak desk visible between camera and object; soft natural daylight from the left.\nNeutral color temperature; soft contact shadow on the desk.\n[NEGATIVE PROMPT]\nfull standing pokemon figure, bipedal figurine, plush toy, action figure, different silhouette than reference, non-spherical shape, generic bulbasaur fan art, monochrome gray or palette that contradicts the color reference,\nprofile view, extreme three-quarter angle, 45 degree rotation, 90 degree side view, top-down, bird's eye, Dutch angle, worm's eye,\ndesk props, game consoles, game cases, tools, plants, filament spools, keychains, glasses, cluttered background, busy scene, floating object, object on cliff edge, flat catalog render, CGI illustration, hands, watermark, N3D logo, wrong colors vs color reference, wrong shape vs geometry reference, neon oversaturation, vertical layer lines, thick layer lines, deep grooves, toy gloss plastic, copying silhouette from N3D color reference, N3D render proportions overriding local photo, local photo palette overriding N3D hues, shape drift from geometry reference, generic N3D catalog pose instead of local photo form\nProduct: 0003 - Venusaur (character).\nPrompt version: v6-local-shape-n3d-color\nCamera yaw: 1°",
+          "model": "vertex-gemini:gemini-2.5-flash-image",
+          "generated_at": "2026-06-03T01:07:25.633Z"
+        }
+      ],
+      "notes": "Generate a photorealistic lifestyle photo of a 3D printed decorative Pokeball-inspired collectible. Product name: 0003 - Venusaur. Category: character. The object must look like a real PLA print: subtle layer lines, realistic lighting, physically plausible reflections, no warping. Scene: premium desk/shelf lifestyle setup, shallow depth of field, no text overlays, no logos, no watermarks. Do not copy any existing product photography. Produce an original composition.",
+      "approved_candidate_id": "cmpxd9tmp0000scdx4i2usr1m",
+      "reviewed_by": "dmont",
+      "reviewed_at": "2026-06-03T01:08:34.854Z"
     },
     {
       "slug": "0004-charmander",
       "product_name": "0004 - Charmander",
-      "status": "pending_generation",
-      "prompt_version": "v1-lifestyle-real-print",
+      "status": "approved",
+      "prompt_version": "v6-local-shape-n3d-color",
       "style": "lifestyle_scene",
       "requested_candidates": 5,
-      "candidates": [],
-      "notes": "Generate a photorealistic lifestyle photo of a 3D printed decorative Pokeball-inspired collectible. Product name: 0004 - Charmander. Category: character. The object must look like a real PLA print: subtle layer lines, realistic lighting, physically plausible reflections, no warping. Scene: premium desk/shelf lifestyle setup, shallow depth of field, no text overlays, no logos, no watermarks. Do not copy any existing product photography. Produce an original composition."
+      "candidates": [
+        {
+          "id": "cmpxdd3y10002esdxo0mlujyk",
+          "image_path": "https://mtwoaurffdknviwsholc.supabase.co/storage/v1/object/public/product-images/0004-charmander/cmpxdd3y10002esdxo0mlujyk.png",
+          "prompt": "Role: Expert in clean, premium e-commerce product photography and technical color grading.\nYou receive 2 reference image(s). Follow each role strictly.\nReference 1 (Busqueda web: 0004 - Charmander Ball - Free 3D Print Model - MakerWorld (makerworld.com)): GEOMETRY (local) — shape weight 1.0, color weight ≤ 0.15. Match silhouette, proportions, pose, and 3D form exactly — this is the authoritative shape source. Do not copy its colors when an N3D color reference is present.\nReference 2 (N3D / sync (protegida)): COLOR (N3D) — palette weight 1.0, shape weight 0.0. Match hues, saturation, and material color exactly. Ignore N3D silhouette, proportions, and pose when a local geometry reference exists.\n[REFERENCE WEIGHTS — STRICT SPLIT]\nLocal GEOMETRY → silhouette, proportions, 3D form: weight 1.0 (authoritative).\nN3D COLOR → hues, saturation, PLA material color: weight 1.0 (authoritative).\nN3D shape / proportions: weight 0.0 — discard when local geometry is present.\nLocal photo colors: weight ≤ 0.15 — subtle print tone only; N3D palette always wins.\n[SCENE — MINIMAL]\nEnvironment: continuous oak wood desk in the foreground, soft neutral gotelé wall in the back.\nNO props, NO accessories, NO extra objects on the desk — only the collectible and honest wood surface.\nCamera: nearly front-facing with 4° horizontal yaw to the left (within ±15° from straight-on; no profile, no extreme 3/4). 50mm lens, f/2.8 aperture, eye-level, gentle background softness (wall only, not busy).\nComposition: keep the collectible readable from the front; only a slight turn for natural product photography.\n[POSITIVE PROMPT]\nA professional, simple, hyper-realistic product photograph of\nthe same decorative Pokéball-inspired 3D-printed PLA collectible:\nAUTHORITATIVE SHAPE — local GEOMETRY reference (weight 1.0): match its silhouette, proportions, feature placement, and 3D form exactly (Charmander Pokéball hybrid).\nAUTHORITATIVE COLOR — N3D COLOR reference (weight 1.0): match its hues, saturation, and PLA material color exactly.\nN3D silhouette weight = 0 when local geometry exists — extract color only from N3D; ignore N3D shape, pose, and proportions.\nLocal photo color weight ≤ 0.15 — ambient print tone at most; never override the N3D palette.\nDo NOT reinterpret as a full standing Pokémon figure.\nRe-stage only: clean oak desk, plain gotelé wall; remove watermark, plants, and original props.\nMatte PLA, VERY SUBTLE fine 0.12mm HORIZONTAL layer lines on the spherical collectible.\nCentered or rule-of-thirds composition; the collectible is the sole hero subject.\nContinuous oak desk visible between camera and object; soft natural daylight from the left.\nNeutral color temperature; soft contact shadow on the desk.\n[NEGATIVE PROMPT]\nfull standing pokemon figure, bipedal figurine, plush toy, action figure, different silhouette than reference, non-spherical shape, generic bulbasaur fan art, monochrome gray or palette that contradicts the color reference,\nprofile view, extreme three-quarter angle, 45 degree rotation, 90 degree side view, top-down, bird's eye, Dutch angle, worm's eye,\ndesk props, game consoles, game cases, tools, plants, filament spools, keychains, glasses, cluttered background, busy scene, floating object, object on cliff edge, flat catalog render, CGI illustration, hands, watermark, N3D logo, wrong colors vs color reference, wrong shape vs geometry reference, neon oversaturation, vertical layer lines, thick layer lines, deep grooves, toy gloss plastic, copying silhouette from N3D color reference, N3D render proportions overriding local photo, local photo palette overriding N3D hues, shape drift from geometry reference, generic N3D catalog pose instead of local photo form\nProduct: 0004 - Charmander (character).\nPrompt version: v6-local-shape-n3d-color\nCamera yaw: -4°",
+          "model": "vertex-gemini:gemini-2.5-flash-image",
+          "generated_at": "2026-06-03T01:09:58.969Z"
+        }
+      ],
+      "notes": "Generate a photorealistic lifestyle photo of a 3D printed decorative Pokeball-inspired collectible. Product name: 0004 - Charmander. Category: character. The object must look like a real PLA print: subtle layer lines, realistic lighting, physically plausible reflections, no warping. Scene: premium desk/shelf lifestyle setup, shallow depth of field, no text overlays, no logos, no watermarks. Do not copy any existing product photography. Produce an original composition.",
+      "approved_candidate_id": "cmpxdd3y10002esdxo0mlujyk",
+      "reviewed_by": "dmont",
+      "reviewed_at": "2026-06-03T01:10:06.805Z"
     },
     {
       "slug": "0005-charmeleon",
       "product_name": "0005 - Charmeleon",
       "status": "pending_generation",
-      "prompt_version": "v1-lifestyle-real-print",
+      "prompt_version": "v3-clean-product-shot",
       "style": "lifestyle_scene",
       "requested_candidates": 5,
       "candidates": [],
@@ -77,7 +132,7 @@
       "slug": "0006-charizard",
       "product_name": "0006 - Charizard",
       "status": "pending_generation",
-      "prompt_version": "v1-lifestyle-real-print",
+      "prompt_version": "v3-clean-product-shot",
       "style": "lifestyle_scene",
       "requested_candidates": 5,
       "candidates": [],
@@ -87,7 +142,7 @@
       "slug": "0006-mega-charizard-x",
       "product_name": "0006 - Mega Charizard X",
       "status": "pending_generation",
-      "prompt_version": "v1-lifestyle-real-print",
+      "prompt_version": "v3-clean-product-shot",
       "style": "lifestyle_scene",
       "requested_candidates": 5,
       "candidates": [],
@@ -97,7 +152,7 @@
       "slug": "0007-squirtle",
       "product_name": "0007 - Squirtle",
       "status": "pending_generation",
-      "prompt_version": "v1-lifestyle-real-print",
+      "prompt_version": "v3-clean-product-shot",
       "style": "lifestyle_scene",
       "requested_candidates": 5,
       "candidates": [],

@@ -3,6 +3,7 @@ import * as path from "path";
 import dotenv from "dotenv";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
+import { CATALOG_PLACEHOLDER_IMAGE_PATH, isValidStoredImagePath } from "../lib/catalog-image";
 import type { Product, ProductsData } from "../types/product";
 
 const OUTPUT_PATH = path.join(process.cwd(), "data", "catalog-public.json");
@@ -26,21 +27,42 @@ function formatPrintTime(seconds: number | null, fallback: string | null): strin
     return `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 }
 
-function mapProduct(
-    row: Awaited<ReturnType<PrismaClient["product"]["findMany"]>>[number] & {
-        images: { imagePath: string; status: string }[];
+function resolvePrimaryImagePath(
+    row: {
+        primaryImageId: string | null;
+        images: { id: string; imagePath: string; status: string }[];
     },
-): Product | null {
-    const approved = row.images.find((img) => img.status === "approved");
-    if (!approved) {
-        console.warn(`Skipping ${row.slug}: visible in catalog but no approved image.`);
-        return null;
+): string {
+    if (row.primaryImageId) {
+        const primary = row.images.find((img) => img.id === row.primaryImageId);
+        if (primary && isValidStoredImagePath(primary.imagePath)) {
+            return primary.imagePath;
+        }
     }
 
+    const approved = row.images.find(
+        (img) => img.status === "approved" && isValidStoredImagePath(img.imagePath),
+    );
+    if (approved) {
+        return approved.imagePath;
+    }
+
+    return CATALOG_PLACEHOLDER_IMAGE_PATH;
+}
+
+function mapProduct(
+    row: Awaited<ReturnType<PrismaClient["product"]["findMany"]>>[number] & {
+        images: { id: string; imagePath: string; status: string; origin: string }[];
+    },
+): Product {
     const category = row.category === "standard" ? "standard" : "character";
     const n3dSlug = row.n3dSlug ?? row.slug;
+    const imagePath = resolvePrimaryImagePath(row);
+    const primary = row.primaryImageId
+        ? row.images.find((img) => img.id === row.primaryImageId)
+        : undefined;
 
-    return {
+    const product: Product = {
         id: row.slug,
         slug: row.slug,
         name: row.name,
@@ -52,12 +74,7 @@ function mapProduct(
         pokemon_name: row.pokemonName ?? undefined,
         pokedex_number: row.pokedexNumber ?? undefined,
         pokemon_types: row.pokemonTypes.length ? row.pokemonTypes : undefined,
-        image_path: approved.imagePath,
-        image_source: "ai-generated",
-        ai_asset: {
-            status: "approved",
-            approved_image_path: approved.imagePath,
-        },
+        image_path: imagePath,
         n3d_url: `https://n3dmelbourne.com/designs/${n3dSlug}`,
         custom_description: row.shortDescription ?? undefined,
         price: row.priceCents != null ? row.priceCents / 100 : undefined,
@@ -66,6 +83,20 @@ function mapProduct(
         visible_in_catalog: true,
         last_synced: row.updatedAt.toISOString(),
     };
+
+    if (primary?.status === "approved") {
+        if (primary.origin === "ai_generated") {
+            product.image_source = "ai-generated";
+            product.ai_asset = {
+                status: "approved",
+                approved_image_path: primary.imagePath,
+            };
+        } else if (primary.origin === "real_photo") {
+            product.image_source = "n3d-local";
+        }
+    }
+
+    return product;
 }
 
 async function main() {
@@ -77,16 +108,13 @@ async function main() {
             where: { isVisibleInCatalog: true },
             include: {
                 images: {
-                    where: { status: "approved" },
                     orderBy: { updatedAt: "desc" },
                 },
             },
             orderBy: { name: "asc" },
         });
 
-        const products = rows
-            .map(mapProduct)
-            .filter((product): product is Product => product !== null);
+        const products = rows.map(mapProduct);
 
         const payload: ProductsData = {
             version: "1.0.0",
@@ -96,8 +124,11 @@ async function main() {
         };
 
         fs.writeFileSync(OUTPUT_PATH, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
+        const withPlaceholder = products.filter(
+            (p) => p.image_path === CATALOG_PLACEHOLDER_IMAGE_PATH,
+        ).length;
         console.log(
-            `Exported ${products.length} product(s) to catalog-public.json (${rows.length - products.length} skipped).`,
+            `Exported ${products.length} product(s) to catalog-public.json (${withPlaceholder} sin imagen principal, PND).`,
         );
     } finally {
         await prisma.$disconnect();

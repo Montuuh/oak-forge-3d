@@ -34,7 +34,7 @@ type QueueFile = {
 const PRODUCTS_JSON_PATH = path.join(process.cwd(), 'data', 'products.json');
 const QUEUE_JSON_PATH = path.join(process.cwd(), 'data', 'ai-image-queue.json');
 const AI_IMAGES_DIR = path.join(process.cwd(), 'public', 'images', 'products-ai');
-const DEFAULT_PROMPT_VERSION = 'v1-lifestyle-real-print';
+const DEFAULT_PROMPT_VERSION = "v3-clean-product-shot";
 
 function parseLimitArg(): number | undefined {
     const arg = process.argv.find((value) => value.startsWith('--limit='));

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
+import { CatalogProductImage } from "@/components/CatalogProductImage";
+import { hasCatalogImage } from "@/lib/catalog-image";
 import { getAllProductSlugs, getProductBySlug, formatPrintTime, formatWeight, resolveProductImagePath } from "@/lib/products";
 import type { Metadata } from "next";
 
@@ -33,7 +34,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         openGraph: {
             title: product.name,
             description: product.custom_description || `Figura 3D: ${product.name}`,
-            images: [imagePath],
+            ...(hasCatalogImage(imagePath) ? { images: [imagePath] } : {}),
         },
     };
 }
@@ -93,10 +94,9 @@ export default function ProductPage({ params }: PageProps) {
                     {/* Image Section */}
                     <div className="relative">
                         <div className="aspect-square relative rounded-2xl overflow-hidden glass-strong">
-                            <Image
+                            <CatalogProductImage
                                 src={imagePath}
                                 alt={product.name}
-                                fill
                                 className="object-cover"
                                 priority
                                 sizes="(max-width: 1024px) 100vw, 50vw"

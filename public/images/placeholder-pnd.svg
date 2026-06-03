@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="Imagen pendiente">
+  <rect width="512" height="512" fill="#1a1a1f"/>
+  <rect x="32" y="32" width="448" height="448" rx="24" fill="none" stroke="#3f3f46" stroke-width="4" stroke-dasharray="12 8"/>
+  <text x="256" y="272" text-anchor="middle" font-family="system-ui, sans-serif" font-size="56" font-weight="600" fill="#71717a">PND</text>
+</svg>

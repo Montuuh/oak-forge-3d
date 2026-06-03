@@ -1,0 +1,38 @@
+---
+description: Probar cambios web en localhost con el MCP del navegador (browser) antes de cerrar la tarea
+alwaysApply: true
+---
+
+# Pruebas web en localhost — doctrina
+
+Cuando el usuario pida **testear** o **probar** algo implementado en la web, se refiere a **entrar tú mismo en localhost con el MCP del navegador** (`cursor-ide-browser`: `browser_navigate`, `browser_snapshot`, `browser_click`, etc.) y verificar el flujo de punta a punta. No basta con decir que funciona ni solo con scripts headless.
+
+## Obligatorio tras cambios de UI / admin / flujos web
+
+1. **Comprobar que el dev server responde** (`npm run dev`, normalmente `http://localhost:3000`).
+2. **Abrir localhost con el MCP del navegador** y recorrer el flujo implementado como haría un usuario.
+3. **Interactuar**: login admin, clicks, checkboxes, formularios, mensajes de error/éxito.
+4. **Capturar evidencia**: `browser_snapshot` y, si ayuda, `browser_take_screenshot`.
+5. **Reportar** qué URL probaste, qué hiciste y qué viste (ok o fallo concreto).
+
+## Orden de herramientas
+
+| Prioridad | Herramienta | Uso |
+|-----------|-------------|-----|
+| 1 | **MCP `cursor-ide-browser`** | Verificación manual en localhost (lo que pide el usuario) |
+
+## Flujo MCP recomendado
+
+1. `browser_tabs` → `browser_navigate` a la URL (p. ej. `/admin/login`).
+2. `browser_lock` antes de interacciones largas; `browser_unlock` al terminar.
+3. `browser_snapshot` para obtener refs antes de click/fill.
+4. Login admin con `ADMIN_PASSWORD` de `.env.local` (no repetir la contraseña al usuario).
+5. Navegar a la página tocada (p. ej. `/admin/products/0001-bulbasaur`).
+6. Probar controles nuevos (checkbox «Usar como referencia», botones, subidas).
+7. Confirmar persistencia (recargar o snapshot tras acción).
+
+## Reglas
+
+- Tras cambios en `prisma/schema.prisma`: `npm run prisma:generate` y **reiniciar** `npm run dev`.
+- No ejecutar **generación AI real** en el browser salvo que el usuario lo pida (coste/cuota).
+- Si localhost no responde, arrancar el dev server y reintentar antes de reportar fallo.

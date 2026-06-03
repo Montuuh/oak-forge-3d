@@ -63,11 +63,13 @@ model ProductImage {
   sourceModel   String?
   reviewedBy    String?
   reviewedAt    DateTime?
-  notes         String?
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  notes            String?
+  useAsReference   Boolean     @default(true)
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
 
   @@index([productId, status])
+  @@index([productId, useAsReference])
 }
 
 model Taxonomy {
