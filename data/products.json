@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "last_updated": "2026-06-03T01:16:07.125Z",
+  "last_updated": "2026-06-03T14:57:24.448Z",
   "total_products": 219,
   "products": [
     {
@@ -11,7 +11,7 @@
       "print_time": "4:20:37",
       "print_time_seconds": 0,
       "weight_grams": 87,
-      "image_path": "https://mtwoaurffdknviwsholc.supabase.co/storage/v1/object/public/product-images/0001-bulbasaur/cmpxbhnmz000098dxyqett30f.png",
+      "image_path": "https://mtwoaurffdknviwsholc.supabase.co/storage/v1/object/public/product-images/0001-bulbasaur/cmpy6w5ph0000rodxulpynybw.png",
       "n3d_url": "https://n3dmelbourne.com/designs/0001-bulbasaur",
       "last_synced": "2026-02-03T14:02:39.900Z",
       "pokemon_name": "bulbasaur",
@@ -24,11 +24,11 @@
       "ai_asset": {
         "status": "approved",
         "source_model": "vertex-gemini:gemini-2.5-flash-image",
-        "prompt_version": "v5-color-geometry-split",
-        "generated_at": "2026-06-03T00:17:31.883Z",
-        "reviewed_at": "2026-06-03T00:18:55.324Z",
+        "prompt_version": "v7-fixed-studio-scene",
+        "generated_at": "2026-06-03T14:56:36.581Z",
+        "reviewed_at": "2026-06-03T14:57:24.447Z",
         "reviewed_by": "dmont",
-        "approved_image_path": "https://mtwoaurffdknviwsholc.supabase.co/storage/v1/object/public/product-images/0001-bulbasaur/cmpxbhnmz000098dxyqett30f.png"
+        "approved_image_path": "https://mtwoaurffdknviwsholc.supabase.co/storage/v1/object/public/product-images/0001-bulbasaur/cmpy6w5ph0000rodxulpynybw.png"
       },
       "image_source": "ai-generated"
     },

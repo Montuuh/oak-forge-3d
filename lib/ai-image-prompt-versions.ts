@@ -2,12 +2,18 @@
 
 export const PROMPT_VERSION_V5 = "v5-color-geometry-split";
 export const PROMPT_VERSION_V6 = "v6-local-shape-n3d-color";
+export const PROMPT_VERSION_V7 = "v7-fixed-studio-scene";
 
-const DEFAULT_PROMPT_VERSION = PROMPT_VERSION_V6;
+const DEFAULT_PROMPT_VERSION = PROMPT_VERSION_V7;
 
 export const PROMPT_VERSION_OPTIONS = [
     { value: PROMPT_VERSION_V5, label: "v5", hint: "Color y forma equilibrados" },
     { value: PROMPT_VERSION_V6, label: "v6", hint: "Forma local · color N3D" },
+    {
+        value: PROMPT_VERSION_V7,
+        label: "v7",
+        hint: "Estudio fijo (mesa + gotelé) + ref. de escena",
+    },
 ] as const;
 
 export function getDefaultPromptVersion(): string {
@@ -23,5 +29,13 @@ export function resolvePromptVersion(version?: string | null): string {
 }
 
 export function isV6PromptVersion(version: string): boolean {
-    return version === PROMPT_VERSION_V6 || version.startsWith("v6-");
+    return (
+        version === PROMPT_VERSION_V6 ||
+        version.startsWith("v6-") ||
+        isV7PromptVersion(version)
+    );
+}
+
+export function isV7PromptVersion(version: string): boolean {
+    return version === PROMPT_VERSION_V7 || version.startsWith("v7-");
 }

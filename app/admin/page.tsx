@@ -22,8 +22,10 @@ export default function AdminPage() {
                     <div className="glass rounded-2xl p-6">
                         <h2 className="text-xl font-semibold mb-4">Prioridad inmediata</h2>
                         <p className="text-sm text-zinc-300">
-                            Consistencia de escena AI: misma mesa roble y pared gotelé en todas las
-                            fotos generadas (pendiente de implementar).
+                            Prompt <strong className="text-zinc-200">v7</strong>: estudio fijo con
+                            referencia de escena (mesa roble + gotelé). Sube{" "}
+                            <code className="text-zinc-400">public/images/studio/default.jpg</code> o
+                            una escena personalizada desde la ficha de producto.
                         </p>
                     </div>
 

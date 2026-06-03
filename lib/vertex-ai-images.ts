@@ -1,6 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
 import type { GenerationImageInputs } from "@/lib/ai-image-inputs";
 import { buildGeminiImageGenerationParts } from "@/lib/gemini-image-parts";
+import { buildGeminiImageGenerateContentConfig } from "@/lib/gemini-image-generation-config";
 
 export type VertexGeneratedImage = {
     buffer: Buffer;
@@ -11,6 +12,31 @@ export type VertexGeneratedImage = {
 
 const DEFAULT_VERTEX_GEMINI_MODEL = "gemini-2.5-flash-image";
 const DEFAULT_VERTEX_IMAGEN_MODEL = "imagen-3.0-generate-002";
+
+/** Modelos Gemini imagen que suelen requerir endpoint global en Vertex (no europe-west1). */
+const VERTEX_GLOBAL_IMAGE_MODELS = new Set([
+    "gemini-3.1-flash-image",
+    "gemini-3.1-flash-image-preview",
+    "gemini-3-pro-image",
+    "gemini-3-pro-image-preview",
+]);
+
+function modelPrefersGlobalEndpoint(model: string): boolean {
+    if (VERTEX_GLOBAL_IMAGE_MODELS.has(model)) return true;
+    return model.startsWith("gemini-3.1-flash-image") || model.startsWith("gemini-3-pro-image");
+}
+
+function resolveVertexImageLocation(model: string, configuredLocation: string): string {
+    const location = configuredLocation.trim() || "europe-west1";
+    if (location === "global") return "global";
+    if (modelPrefersGlobalEndpoint(model)) {
+        const forceGlobal = process.env.VERTEX_IMAGE_USE_GLOBAL_LOCATION?.trim().toLowerCase();
+        if (forceGlobal === "1" || forceGlobal === "true" || forceGlobal === "yes") {
+            return "global";
+        }
+    }
+    return location;
+}
 
 export type VertexImageConfig = {
     project: string;
@@ -64,7 +90,7 @@ export function getVertexImageConfig(): VertexImageConfig {
         );
     }
 
-    const location =
+    const configuredLocation =
         process.env.GOOGLE_CLOUD_LOCATION?.trim() ||
         process.env.VERTEX_LOCATION?.trim() ||
         "europe-west1";
@@ -72,6 +98,10 @@ export function getVertexImageConfig(): VertexImageConfig {
     const backend = getVertexImageBackend();
     const model =
         backend === "gemini" ? resolveVertexGeminiModel() : resolveVertexImagenModel();
+    const location =
+        backend === "gemini"
+            ? resolveVertexImageLocation(model, configuredLocation)
+            : configuredLocation;
 
     return { project, location, backend, model };
 }
@@ -98,8 +128,27 @@ export function createVertexGenAIClient(config?: Pick<VertexImageConfig, "projec
     });
 }
 
-function wrapVertexError(error: unknown): Error {
+function isVertexModelNotFoundError(raw: string): boolean {
+    return /NOT_FOUND|404|not found/i.test(raw) && /Publisher Model/i.test(raw);
+}
+
+function wrapVertexError(
+    error: unknown,
+    context?: { model?: string; location?: string },
+): Error {
     const raw = error instanceof Error ? error.message : String(error);
+    if (isVertexModelNotFoundError(raw) && context?.model) {
+        const hints = [
+            `Quita VERTEX_GEMINI_IMAGE_MODEL o usa ${DEFAULT_VERTEX_GEMINI_MODEL} (funciona en europe-west1).`,
+            "Para gemini-3.x imagen en Vertex: VERTEX_IMAGE_USE_GLOBAL_LOCATION=true y GOOGLE_CLOUD_LOCATION=global.",
+            "Prueba gemini-3.1-flash-image-preview si tu proyecto tiene acceso preview.",
+        ];
+        return new Error(
+            `Modelo Vertex no disponible: ${context.model} en ${context.location ?? "?"}. ` +
+                hints.join(" ") +
+                ` Detalle: ${raw}`,
+        );
+    }
     if (/Could not load the default credentials/i.test(raw)) {
         return new Error(
             "Sin credenciales GCP. Ejecuta `gcloud auth application-default login` o define GOOGLE_APPLICATION_CREDENTIALS.",
@@ -145,26 +194,25 @@ async function generateWithVertexImagen(
             backend: "vertex-imagen",
         };
     } catch (error) {
-        throw wrapVertexError(error);
+        throw wrapVertexError(error, { model });
     }
 }
 
 async function generateWithVertexGeminiImage(
-    ai: GoogleGenAI,
+    config: VertexImageConfig,
     prompt: string,
-    model: string,
     inputs?: GenerationImageInputs,
     options?: { promptVersion?: string },
 ): Promise<VertexGeneratedImage> {
-    try {
-        const parts = buildGeminiImageGenerationParts(prompt, inputs, options?.promptVersion);
+    const parts = buildGeminiImageGenerationParts(prompt, inputs, options?.promptVersion);
+    const genConfig = buildGeminiImageGenerateContentConfig(options);
 
+    async function runWithLocation(location: string): Promise<VertexGeneratedImage> {
+        const ai = createVertexGenAIClient({ project: config.project, location });
         const response = await ai.models.generateContent({
-            model,
+            model: config.model,
             contents: [{ role: "user", parts }],
-            config: {
-                responseModalities: ["IMAGE"],
-            },
+            config: genConfig,
         });
 
         const responseParts = response.candidates?.[0]?.content?.parts ?? [];
@@ -174,15 +222,36 @@ async function generateWithVertexGeminiImage(
                 return {
                     buffer: Buffer.from(inline.data, "base64"),
                     contentType: inline.mimeType || "image/png",
-                    model,
+                    model: config.model,
                     backend: "vertex-gemini",
                 };
             }
         }
 
         throw new Error("Vertex Gemini no devolvio imagen en la respuesta.");
+    }
+
+    try {
+        return await runWithLocation(config.location);
     } catch (error) {
-        throw wrapVertexError(error);
+        const raw = error instanceof Error ? error.message : String(error);
+        const canRetryGlobal =
+            config.location !== "global" &&
+            modelPrefersGlobalEndpoint(config.model) &&
+            isVertexModelNotFoundError(raw);
+
+        if (canRetryGlobal) {
+            try {
+                return await runWithLocation("global");
+            } catch (retryError) {
+                throw wrapVertexError(retryError, {
+                    model: config.model,
+                    location: "global",
+                });
+            }
+        }
+
+        throw wrapVertexError(error, { model: config.model, location: config.location });
     }
 }
 
@@ -194,10 +263,9 @@ export async function generateLifestyleImageViaVertex(
     options?: { promptVersion?: string },
 ): Promise<VertexGeneratedImage> {
     const config = getVertexImageConfig();
-    const ai = client ?? createVertexGenAIClient(config);
 
     if (config.backend === "gemini") {
-        return generateWithVertexGeminiImage(ai, prompt, config.model, inputs, options);
+        return generateWithVertexGeminiImage(config, prompt, inputs, options);
     }
 
     if ((inputs?.references?.length ?? 0) > 0) {
@@ -207,5 +275,6 @@ export async function generateLifestyleImageViaVertex(
         );
     }
 
+    const ai = client ?? createVertexGenAIClient(config);
     return generateWithVertexImagen(ai, prompt, config.model);
 }

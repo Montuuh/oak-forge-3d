@@ -1,9 +1,11 @@
 "use client";
 
+import { AdminStudioScenePanel } from "@/components/admin/AdminStudioScenePanel";
 import {
     getDefaultPromptVersion,
     PROMPT_VERSION_OPTIONS,
 } from "@/lib/ai-image-prompt-versions";
+import type { StudioSceneStatus } from "@/lib/studio-scene-types";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -17,6 +19,7 @@ type AdminImageActionsProps = {
     maxCandidates?: number;
     imageBroken?: boolean;
     canDelete?: boolean;
+    studioSceneStatus?: StudioSceneStatus;
 };
 
 async function postJson(url: string, body: Record<string, string | undefined>) {
@@ -47,6 +50,7 @@ export function AdminImageActions({
     maxCandidates = 5,
     imageBroken = false,
     canDelete = true,
+    studioSceneStatus,
 }: AdminImageActionsProps) {
     const router = useRouter();
     const [loading, setLoading] = useState<string | null>(null);
@@ -183,6 +187,13 @@ export function AdminImageActions({
                         placeholder="Motivo del rechazo"
                     />
                 </label>
+            )}
+
+            {showGenerate && studioSceneStatus && (
+                <AdminStudioScenePanel
+                    initialStatus={studioSceneStatus}
+                    promptVersion={promptVersion}
+                />
             )}
 
             {showGenerate && !canGenerate && (

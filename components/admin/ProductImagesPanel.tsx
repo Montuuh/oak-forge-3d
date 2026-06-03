@@ -6,6 +6,7 @@ import { findQueueEntry } from "@/lib/ai-image-queue-file";
 import { isValidStoredImagePath } from "@/lib/catalog-image";
 import { localImageFileOnDisk } from "@/lib/admin-local-images";
 import { getImageGenerationProviderSummary } from "@/lib/lifestyle-image-generation";
+import { getStudioSceneStatus } from "@/lib/studio-scene-reference";
 
 type ProductImage = {
     id: string;
@@ -53,6 +54,7 @@ export function ProductImagesPanel({
     const brokenCount = aiImages.filter((img) => !isValidStoredImagePath(img.imagePath)).length;
     const queueEntry = findQueueEntry(slug);
     const generationProvider = getImageGenerationProviderSummary();
+    const studioSceneStatus = getStudioSceneStatus();
 
     return (
         <div className="space-y-8">
@@ -124,6 +126,7 @@ export function ProductImagesPanel({
                 showGenerate
                 generateOnly
                 candidateCount={activeCandidates}
+                studioSceneStatus={studioSceneStatus}
             />
 
             {brokenCount > 0 && (

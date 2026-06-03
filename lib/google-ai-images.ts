@@ -1,6 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
 import type { GenerationImageInputs } from "@/lib/ai-image-inputs";
 import { buildGeminiImageGenerationParts } from "@/lib/gemini-image-parts";
+import { buildGeminiImageGenerateContentConfig } from "@/lib/gemini-image-generation-config";
 
 export type GeneratedImage = {
     buffer: Buffer;
@@ -130,12 +131,10 @@ async function generateWithGeminiImage(
         const parts = buildGeminiImageGenerationParts(prompt, inputs, options?.promptVersion);
 
         const response = await ai.models.generateContent({
-        model,
-        contents: [{ role: "user", parts }],
-        config: {
-            responseModalities: ["IMAGE"],
-        },
-    });
+            model,
+            contents: [{ role: "user", parts }],
+            config: buildGeminiImageGenerateContentConfig(options),
+        });
 
     const responseParts = response.candidates?.[0]?.content?.parts ?? [];
     for (const part of responseParts) {

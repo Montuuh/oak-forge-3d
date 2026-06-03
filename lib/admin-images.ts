@@ -1,6 +1,11 @@
 import { getAdminReviewerName } from "@/lib/admin-reviewer";
 import { revalidatePath } from "next/cache";
-import { buildLifestyleImagePrompt, getDefaultPromptVersion, pickLifestyleCameraYawDegrees, resolvePromptVersion } from "@/lib/ai-image-prompt";
+import {
+    buildLifestyleImagePrompt,
+    getDefaultPromptVersion,
+    pickCameraYawForPromptVersion,
+    resolvePromptVersion,
+} from "@/lib/ai-image-prompt";
 import {
     findQueueEntry,
     getPilotSlugs,
@@ -14,6 +19,7 @@ import { generateLifestyleImageForAdmin } from "@/lib/lifestyle-image-generation
 import { updateProductBySlug } from "@/lib/products-data-file";
 import { isValidStoredImagePath } from "@/lib/catalog-image";
 import { loadGenerationImageInputs } from "@/lib/ai-image-inputs";
+import { mergeStudioSceneIntoInputs } from "@/lib/studio-scene-reference";
 import { summarizeReferenceInputs } from "@/lib/gemini-image-parts";
 import { fetchRemoteImage } from "@/lib/safe-remote-image-fetch";
 import { collectLocalImageSources } from "@/lib/admin-local-images";
@@ -324,7 +330,8 @@ export async function generateCandidateForProduct(
             img.useAsReference &&
             isValidStoredImagePath(img.imagePath),
     );
-    const inputs = await loadGenerationImageInputs(product.slug, productImages);
+    const baseInputs = await loadGenerationImageInputs(product.slug, productImages);
+    const inputs = await mergeStudioSceneIntoInputs(baseInputs, promptVersion);
 
     if (markedRefs.length === 0) {
         throw new Error(
@@ -339,7 +346,7 @@ export async function generateCandidateForProduct(
         );
     }
 
-    const cameraYaw = pickLifestyleCameraYawDegrees();
+    const cameraYaw = pickCameraYawForPromptVersion(promptVersion);
     const prompt = buildLifestyleImagePrompt(
         {
             name: product.name,

@@ -30,7 +30,31 @@ GOOGLE_CLOUD_LOCATION=europe-west1
 VERTEX_IMAGE_BACKEND=gemini
 VERTEX_IMAGE_MODEL=gemini-2.5-flash-image
 # VERTEX_IMAGEN_MODEL=imagen-3.0-generate-002
+# Resolucion / aspecto (v7 estudio ancho → 16:9 por defecto)
+GEMINI_IMAGE_SIZE=2K
+# GEMINI_IMAGE_ASPECT_RATIO=16:9
 ```
+
+### Modelos de imagen
+
+| Modelo | Vertex + europe-west1 | Notas |
+|--------|----------------------|--------|
+| `gemini-2.5-flash-image` | Si (recomendado) | Default del proyecto |
+| `gemini-3.1-flash-image` | A menudo **no** | Usar endpoint `global` o preview |
+| `gemini-3.1-flash-image-preview` | Con `location=global` | Nano Banana 2 |
+
+Si ves `Publisher Model ... gemini-3.1-flash-image was not found`:
+
+1. Quita `VERTEX_GEMINI_IMAGE_MODEL` (vuelve a 2.5), **o**
+2. Prueba:
+
+```env
+VERTEX_GEMINI_IMAGE_MODEL=gemini-3.1-flash-image-preview
+VERTEX_IMAGE_USE_GLOBAL_LOCATION=true
+GOOGLE_CLOUD_LOCATION=global
+```
+
+Reinicia `npm run dev` tras cambiar `.env.local`.
 
 No toques `GEMINI_API_KEY` / `GOOGLE_IMAGE_*` — siguen siendo la ruta AI Studio en admin.
 
