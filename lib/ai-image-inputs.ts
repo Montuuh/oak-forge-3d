@@ -1,7 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
 import { isValidStoredImagePath } from "@/lib/catalog-image";
-import { publicPathExists } from "@/lib/local-product-image-storage";
+import { publicPathExists } from "@/lib/static-public-assets";
 import { isN3dProtectedImagePath } from "@/lib/n3d-product-image";
 
 export type ImageFilePayload = {

@@ -8,11 +8,13 @@ import { useState } from "react";
 type AdminStudioScenePanelProps = {
     initialStatus: StudioSceneStatus;
     promptVersion: string;
+    compact?: boolean;
 };
 
 export function AdminStudioScenePanel({
     initialStatus,
     promptVersion,
+    compact = false,
 }: AdminStudioScenePanelProps) {
     const router = useRouter();
     const [status, setStatus] = useState(initialStatus);
@@ -87,21 +89,26 @@ export function AdminStudioScenePanel({
     }
 
     return (
-        <div className="mt-3 rounded-xl border border-violet-500/25 bg-violet-950/20 p-3">
-            <p className="text-sm font-medium text-violet-100">Referencia de escena (v7)</p>
-            <p className="mt-1 text-xs text-zinc-400">
-                Mesa roble + pared gotelé fijas. Por defecto{" "}
-                <code className="text-zinc-300">public/images/studio/default.jpg</code>; puedes
-                subir otra para todo el catalogo.
-            </p>
-            <p className="mt-2 text-xs text-zinc-500">
-                Activa: <span className="text-zinc-300">{status.label}</span>
-                {status.source === "missing" && (
-                    <span className="ml-1 text-amber-200/90">
-                        — sube una escena antes de generar con v7.
-                    </span>
-                )}
-            </p>
+        <div
+            className={
+                compact
+                    ? "rounded-xl border border-violet-500/20 bg-violet-950/15 p-3"
+                    : "mt-3 rounded-xl border border-violet-500/25 bg-violet-950/20 p-3"
+            }
+        >
+            <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-sm font-medium text-violet-100">Escena de estudio (v7)</p>
+                <span className="text-xs text-zinc-500">{status.label}</span>
+            </div>
+            {!compact && (
+                <p className="mt-1 text-xs text-zinc-400">
+                    Mesa roble + gotelé. Default:{" "}
+                    <code className="text-zinc-300">public/images/studio/default.jpg</code>
+                </p>
+            )}
+            {status.source === "missing" && (
+                <p className="mt-1 text-xs text-amber-200/90">Sube una escena antes de generar con v7.</p>
+            )}
 
             {status.webPath && (
                 <div className="mt-3 overflow-hidden rounded-lg border border-white/10 bg-zinc-900/50">

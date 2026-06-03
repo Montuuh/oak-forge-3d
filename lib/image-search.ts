@@ -9,7 +9,10 @@ export type ImageSearchCandidate = {
     sourceHost: string;
 };
 
-const DEFAULT_LIMIT = 10;
+export const IMAGE_SEARCH_DEFAULT_LIMIT = 50;
+export const IMAGE_SEARCH_MAX_LIMIT = 50;
+
+const DEFAULT_LIMIT = IMAGE_SEARCH_DEFAULT_LIMIT;
 
 function candidateId(url: string): string {
     return createHash("sha256").update(url).digest("hex").slice(0, 16);
@@ -83,7 +86,7 @@ async function searchWithSerper(query: string, limit: number): Promise<ImageSear
         },
         body: JSON.stringify({
             q: query,
-            num: Math.min(Math.max(limit, 1), 10),
+            num: Math.min(Math.max(limit, 1), IMAGE_SEARCH_MAX_LIMIT),
         }),
     });
 
@@ -144,53 +147,63 @@ async function searchWithGoogleCse(query: string, limit: number): Promise<ImageS
         throw new Error("Faltan GOOGLE_CSE_API_KEY y GOOGLE_CSE_ID.");
     }
 
-    const params = new URLSearchParams({
-        key: apiKey,
-        cx,
-        q: query,
-        searchType: "image",
-        num: String(Math.min(Math.max(limit, 1), 10)),
-        safe: "active",
-    });
-
-    const response = await fetch(`https://www.googleapis.com/customsearch/v1?${params.toString()}`);
-    const payload = parseSearchProviderJson<{
-        error?: { message?: string };
-        items?: GoogleCseItem[];
-    }>(response, await response.text(), "google_cse");
-
-    if (!response.ok) {
-        const message = payload.error?.message || `Error de busqueda (${response.status}).`;
-        if (/does not have the access to Custom Search JSON API/i.test(message)) {
-            throw new Error(
-                "Tu proyecto GCP no tiene acceso a Custom Search JSON API (Google ya no la da a cuentas nuevas). " +
-                    "Usa Serper: SERPER_API_KEY en .env.local e IMAGE_SEARCH_PROVIDER=serper.",
-            );
-        }
-        throw new Error(message);
-    }
-
+    const cappedLimit = Math.min(Math.max(limit, 1), IMAGE_SEARCH_MAX_LIMIT);
     const seen = new Set<string>();
     const candidates: ImageSearchCandidate[] = [];
 
-    for (const item of payload.items ?? []) {
-        const imageUrl = item.link?.trim();
-        if (!imageUrl || seen.has(imageUrl)) continue;
-        seen.add(imageUrl);
-
-        const thumbnailUrl = item.image?.thumbnailLink?.trim() || imageUrl;
-        const sourcePage = item.image?.contextLink?.trim() || imageUrl;
-
-        candidates.push({
-            id: candidateId(imageUrl),
-            imageUrl,
-            thumbnailUrl,
-            title: item.title?.trim() || "Sin titulo",
-            sourcePage,
-            sourceHost: item.displayLink?.trim() || hostFromUrl(sourcePage),
+    for (let start = 1; start <= 91 && candidates.length < cappedLimit; start += 10) {
+        const pageSize = Math.min(10, cappedLimit - candidates.length);
+        const params = new URLSearchParams({
+            key: apiKey,
+            cx,
+            q: query,
+            searchType: "image",
+            num: String(pageSize),
+            start: String(start),
+            safe: "active",
         });
 
-        if (candidates.length >= limit) break;
+        const response = await fetch(
+            `https://www.googleapis.com/customsearch/v1?${params.toString()}`,
+        );
+        const payload = parseSearchProviderJson<{
+            error?: { message?: string };
+            items?: GoogleCseItem[];
+        }>(response, await response.text(), "google_cse");
+
+        if (!response.ok) {
+            const message = payload.error?.message || `Error de busqueda (${response.status}).`;
+            if (/does not have the access to Custom Search JSON API/i.test(message)) {
+                throw new Error(
+                    "Tu proyecto GCP no tiene acceso a Custom Search JSON API (Google ya no la da a cuentas nuevas). " +
+                        "Usa Serper: SERPER_API_KEY en .env.local e IMAGE_SEARCH_PROVIDER=serper.",
+                );
+            }
+            throw new Error(message);
+        }
+
+        const items = payload.items ?? [];
+        if (items.length === 0) break;
+
+        for (const item of items) {
+            const imageUrl = item.link?.trim();
+            if (!imageUrl || seen.has(imageUrl)) continue;
+            seen.add(imageUrl);
+
+            const thumbnailUrl = item.image?.thumbnailLink?.trim() || imageUrl;
+            const sourcePage = item.image?.contextLink?.trim() || imageUrl;
+
+            candidates.push({
+                id: candidateId(imageUrl),
+                imageUrl,
+                thumbnailUrl,
+                title: item.title?.trim() || "Sin titulo",
+                sourcePage,
+                sourceHost: item.displayLink?.trim() || hostFromUrl(sourcePage),
+            });
+
+            if (candidates.length >= cappedLimit) break;
+        }
     }
 
     if (candidates.length === 0) {
@@ -204,11 +217,12 @@ export async function searchImageCandidates(
     query: string,
     limit = DEFAULT_LIMIT,
 ): Promise<ImageSearchCandidate[]> {
+    const capped = Math.min(Math.max(limit, 1), IMAGE_SEARCH_MAX_LIMIT);
     const provider = getImageSearchProvider();
     if (provider === "serper") {
-        return searchWithSerper(query, limit);
+        return searchWithSerper(query, capped);
     }
-    return searchWithGoogleCse(query, limit);
+    return searchWithGoogleCse(query, capped);
 }
 
 export function getImageSearchProviderLabel(): string {

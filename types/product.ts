@@ -67,7 +67,7 @@ export interface Product {
     last_synced: string;     // ISO timestamp
 }
 
-/** Structure of the products.json file */
+/** Estructura del catalogo publico (Postgres / API) */
 export interface ProductsData {
     version: string;
     last_updated: string;

@@ -57,15 +57,15 @@ export default async function AdminProductDetailPage({ params, searchParams }: P
 
     if (loadError || !product) {
         return (
-            <div className="container mx-auto max-w-4xl px-4 py-12">
+            <div className="container mx-auto max-w-6xl px-4 py-12">
                 <Link href="/admin/products" className="text-sm text-zinc-400 hover:text-white">
                     ← Volver al listado
                 </Link>
                 <h1 className="mt-4 text-2xl font-bold text-red-200">Error al cargar {params.slug}</h1>
                 <p className="mt-2 text-sm text-zinc-400">{loadError}</p>
                 <p className="mt-4 text-sm text-zinc-500">
-                    Si el producto no esta en Postgres:{" "}
-                    <code className="text-zinc-300">npm run db:import-products</code>.
+                    Comprueba que el slug existe en Postgres (Supabase) y que{" "}
+                    <code className="text-zinc-300">DATABASE_URL</code> es correcto.
                 </p>
             </div>
         );
@@ -73,7 +73,7 @@ export default async function AdminProductDetailPage({ params, searchParams }: P
 
     return (
         <div className="py-8 md:py-12">
-            <div className="container mx-auto max-w-4xl px-4 md:px-6">
+            <div className="container mx-auto max-w-6xl px-4 md:px-6">
                 <div className="mb-6">
                     <Link
                         href="/admin/products"
@@ -97,19 +97,18 @@ export default async function AdminProductDetailPage({ params, searchParams }: P
                     )}
 
                 <div className="space-y-8">
-                    <AdminProductEditForm product={product} action={saveProduct} />
-
                     <ProductImagesPanel
                         productId={product.id}
                         slug={product.slug}
                         images={product.images}
-                        isVisibleInCatalog={product.isVisibleInCatalog}
                         defaultSearchQuery={buildReferenceImageSearchQuery({
                             name: product.name,
                             slug: product.slug,
                             pokemonName: product.pokemonName,
                         })}
                     />
+
+                    <AdminProductEditForm product={product} action={saveProduct} />
                 </div>
             </div>
         </div>

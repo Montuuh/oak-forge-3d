@@ -34,24 +34,36 @@ function splitList(raw: string): string[] {
 export function parseProductFormData(formData: FormData): AdminProductUpdateInput {
     const id = String(formData.get("id") || "");
     const status = String(formData.get("status") || "draft") as ProductStatus;
-    const priceRaw = String(formData.get("priceCents") || "").trim();
+    const priceEurosRaw = String(formData.get("priceEuros") || "").trim();
     const printSecondsRaw = String(formData.get("printTimeSeconds") || "").trim();
     const weightRaw = String(formData.get("weightGrams") || "").trim();
     const pokedexRaw = String(formData.get("pokedexNumber") || "").trim();
 
-    if (!PRODUCT_STATUS_OPTIONS.includes(status)) {
+    const isVisibleInCatalog = formData.get("isVisibleInCatalog") === "on";
+    const resolvedStatus: ProductStatus = isVisibleInCatalog ? "published" : status;
+
+    if (!PRODUCT_STATUS_OPTIONS.includes(resolvedStatus)) {
         throw new Error("Estado de producto invalido.");
+    }
+
+    let priceCents: number | null = null;
+    if (priceEurosRaw) {
+        const euros = Number(priceEurosRaw.replace(",", "."));
+        if (!Number.isFinite(euros) || euros < 0) {
+            throw new Error("Precio invalido.");
+        }
+        priceCents = Math.round(euros * 100);
     }
 
     return {
         id,
         name: String(formData.get("name") || "").trim(),
         category: String(formData.get("category") || "character").trim(),
-        status,
+        status: resolvedStatus,
         n3dSlug: String(formData.get("n3dSlug") || "").trim() || null,
         shortDescription: String(formData.get("shortDescription") || "").trim() || null,
         longDescription: String(formData.get("longDescription") || "").trim() || null,
-        priceCents: priceRaw ? Number(priceRaw) : null,
+        priceCents,
         printTime: String(formData.get("printTime") || "").trim() || null,
         printTimeSeconds: printSecondsRaw ? Number(printSecondsRaw) : null,
         weightGrams: weightRaw ? Number(weightRaw) : null,
@@ -61,7 +73,7 @@ export function parseProductFormData(formData: FormData): AdminProductUpdateInpu
         tags: splitList(String(formData.get("tags") || "")),
         featured: formData.get("featured") === "on",
         available: formData.get("available") === "on",
-        isVisibleInCatalog: formData.get("isVisibleInCatalog") === "on",
+        isVisibleInCatalog,
     };
 }
 

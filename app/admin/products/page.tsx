@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { AdminCatalogExport } from "@/components/admin/AdminCatalogExport";
 import { AdminProductFilters } from "@/components/admin/AdminProductFilters";
 import {
     getImageStatusSummary,
@@ -8,8 +7,6 @@ import {
     parseFiltersFromSearchParams,
     type AdminProductListResult,
 } from "@/lib/admin-product-queries";
-import { getPilotSlugs } from "@/lib/ai-image-queue-file";
-
 export const dynamic = "force-dynamic";
 
 const IMAGE_LABEL = {
@@ -36,7 +33,6 @@ function buildListQuery(
     if (filters.category) params.set("category", filters.category);
     if (filters.visibility) params.set("visibility", filters.visibility);
     if (filters.image) params.set("image", filters.image);
-    if (filters.pilot) params.set("pilot", filters.pilot);
     if (filters.featured) params.set("featured", filters.featured);
     if (filters.available) params.set("available", filters.available);
     Object.entries(overrides).forEach(([k, v]) => params.set(k, String(v)));
@@ -50,8 +46,6 @@ interface AdminProductsPageProps {
 
 export default async function AdminProductsPage({ searchParams = {} }: AdminProductsPageProps) {
     const filters = parseFiltersFromSearchParams(searchParams);
-    const pilotSlugs = new Set(getPilotSlugs());
-
     let result: AdminProductListResult | null = null;
     let loadError: string | null = null;
 
@@ -75,12 +69,8 @@ export default async function AdminProductsPage({ searchParams = {} }: AdminProd
                     <h1 className="font-display text-3xl font-bold">Productos</h1>
                     <p className="mt-2 text-zinc-400">
                         Selecciona un producto para editar datos, imagenes AI y visibilidad. El sitio
-                        en Vercel muestra productos visibles desde la BD; exporta JSON para respaldo
-                        o commit.
+                        publico lee productos visibles desde la BD al abrir cada pagina.
                     </p>
-                    <div className="mt-4">
-                        <AdminCatalogExport />
-                    </div>
                 </div>
 
                 {flash === "saved" && (
@@ -134,11 +124,6 @@ export default async function AdminProductsPage({ searchParams = {} }: AdminProd
                                                     </div>
                                                     <div className="text-xs text-zinc-500">
                                                         {product.slug}
-                                                        {pilotSlugs.has(product.slug) && (
-                                                            <span className="ml-2 text-violet-300">
-                                                                piloto
-                                                            </span>
-                                                        )}
                                                     </div>
                                                 </td>
                                                 <td className="hidden px-4 py-3 md:table-cell">

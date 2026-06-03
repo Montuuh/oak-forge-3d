@@ -20,6 +20,10 @@ type AdminImageActionsProps = {
     imageBroken?: boolean;
     canDelete?: boolean;
     studioSceneStatus?: StudioSceneStatus;
+    showStudioPanel?: boolean;
+    generateLabel?: string;
+    promptVersion?: string;
+    onPromptVersionChange?: (version: string) => void;
 };
 
 async function postJson(url: string, body: Record<string, string | undefined>) {
@@ -51,12 +55,18 @@ export function AdminImageActions({
     imageBroken = false,
     canDelete = true,
     studioSceneStatus,
+    showStudioPanel = true,
+    generateLabel = "Generar candidato AI",
+    promptVersion: promptVersionProp,
+    onPromptVersionChange,
 }: AdminImageActionsProps) {
     const router = useRouter();
     const [loading, setLoading] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [rejectNotes, setRejectNotes] = useState("");
-    const [promptVersion, setPromptVersion] = useState(getDefaultPromptVersion);
+    const [promptVersionInternal, setPromptVersionInternal] = useState(getDefaultPromptVersion);
+    const promptVersion = promptVersionProp ?? promptVersionInternal;
+    const setPromptVersion = onPromptVersionChange ?? setPromptVersionInternal;
 
     async function run(action: string, fn: () => Promise<void>) {
         setError(null);
@@ -81,16 +91,22 @@ export function AdminImageActions({
                 </p>
             )}
 
-            <div className="flex flex-wrap gap-2">
+            <div
+                className={
+                    showGenerate && generateOnly
+                        ? "flex flex-wrap items-end gap-3 rounded-xl border border-violet-500/25 bg-violet-950/20 p-3"
+                        : "flex flex-wrap gap-2"
+                }
+            >
                 {showGenerate && (
                     <>
-                        <label className="flex items-center gap-2 text-sm text-zinc-400">
+                        <label className="flex min-w-[10rem] flex-col gap-1 text-sm text-zinc-400">
                             <span>Prompt</span>
                             <select
                                 value={promptVersion}
                                 onChange={(e) => setPromptVersion(e.target.value)}
                                 disabled={loading !== null || !canGenerate}
-                                className="rounded-lg border border-white/10 bg-zinc-900/70 px-2 py-1.5 text-sm text-zinc-100"
+                                className="rounded-lg border border-white/10 bg-zinc-900/70 px-2 py-2 text-sm text-zinc-100"
                                 aria-label="Version de prompt para generacion AI"
                             >
                                 {PROMPT_VERSION_OPTIONS.map((option) => (
@@ -111,9 +127,13 @@ export function AdminImageActions({
                                     });
                                 })
                             }
-                            className="rounded-lg bg-violet-700 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-violet-600 disabled:opacity-50"
+                            className={
+                                generateOnly
+                                    ? "rounded-lg bg-violet-600 px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-violet-900/30 transition hover:bg-violet-500 disabled:opacity-50"
+                                    : "rounded-lg bg-violet-700 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-violet-600 disabled:opacity-50"
+                            }
                         >
-                            {loading === "generate" ? "Generando…" : "Generar candidato AI"}
+                            {loading === "generate" ? "Generando…" : generateLabel}
                         </button>
                     </>
                 )}
@@ -189,7 +209,7 @@ export function AdminImageActions({
                 </label>
             )}
 
-            {showGenerate && studioSceneStatus && (
+            {showGenerate && showStudioPanel && studioSceneStatus && (
                 <AdminStudioScenePanel
                     initialStatus={studioSceneStatus}
                     promptVersion={promptVersion}

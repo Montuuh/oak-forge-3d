@@ -71,6 +71,6 @@ Version `v3-clean-product-shot`: mesa roble, pared gotelé, **sin props** (foto 
 | Render N3D (protegido) | `public/images/products/{slug}.webp` |
 | Subida manual | `public/images/uploads/{slug}-{id}.ext` |
 
-## Export publico
+## Catalogo publico
 
-Tras aprobar una imagen (local o AI): `npm run catalog:export`.
+Tras aprobar una imagen y marcar visibilidad, el sitio lee desde Postgres; no hace falta exportar JSON.

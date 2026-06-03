@@ -1,5 +1,4 @@
 import { Prisma, ProductStatus } from "@prisma/client";
-import { getPilotSlugs } from "@/lib/ai-image-queue-file";
 import { ADMIN_PRODUCTS_PAGE_SIZE } from "@/lib/admin-product-constants";
 import { db } from "@/lib/db";
 
@@ -9,7 +8,6 @@ export type AdminProductListFilters = {
     category?: string;
     visibility?: "visible" | "hidden" | "";
     image?: "no_ai" | "has_candidates" | "approved" | "needs_review" | "";
-    pilot?: "1" | "";
     featured?: "1" | "0" | "";
     available?: "1" | "0" | "";
     page?: number;
@@ -82,11 +80,6 @@ export function buildProductListWhere(filters: AdminProductListFilters): Prisma.
         where.available = false;
     }
 
-    if (filters.pilot === "1") {
-        const slugs = getPilotSlugs();
-        where.slug = { in: slugs };
-    }
-
     const aiImageFilter = filters.image;
     if (aiImageFilter === "approved") {
         and.push({
@@ -132,7 +125,6 @@ export function parseFiltersFromSearchParams(
         category: pick("category"),
         visibility: pick("visibility") as AdminProductListFilters["visibility"],
         image: pick("image") as AdminProductListFilters["image"],
-        pilot: pick("pilot") as AdminProductListFilters["pilot"],
         featured: pick("featured") as AdminProductListFilters["featured"],
         available: pick("available") as AdminProductListFilters["available"],
         page: parsePage(Number(pick("page"))),

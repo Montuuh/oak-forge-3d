@@ -1,6 +1,6 @@
 # Supabase Storage — bucket de imagenes de producto
 
-El plan gratuito incluye **1 GB** de almacenamiento, suficiente para el piloto y cientos de imagenes (~1–2 MB cada una).
+El plan gratuito incluye **1 GB** de almacenamiento, suficiente para cientos de imagenes (~1–2 MB cada una).
 
 ## 1. Crear bucket publico
 
@@ -40,4 +40,4 @@ Tras generar un candidato en `/admin/products/{slug}`, deberias ver la miniatura
 
 ## 5. Catalogo publico
 
-`next.config.mjs` permite imagenes desde `*.supabase.co`. Las URLs se escriben en `catalog-public.json` al exportar.
+`next.config.mjs` permite imagenes desde `*.supabase.co`. Las URLs viven en `ProductImage.imagePath` en Postgres y el sitio las usa al renderizar.

@@ -9,16 +9,9 @@
         "postinstall": "prisma generate",
         "start": "next start",
         "lint": "next lint",
-        "sync": "tsx scripts/sync-catalog.ts",
-        "sync:catalog": "tsx scripts/sync-catalog.ts",
         "sync:n3d-image": "tsx scripts/download-n3d-image.ts",
-        "ai:queue": "tsx scripts/build-ai-image-queue.ts",
-        "ai:queue:pilot": "tsx scripts/build-ai-image-queue.ts --limit=10",
-        "ai:review": "tsx scripts/review-ai-image.ts",
         "prisma:generate": "prisma generate",
-        "prisma:push": "prisma db push",
-        "db:import-products": "tsx scripts/import-products-to-db.ts",
-        "catalog:export": "tsx scripts/export-catalog-public.ts"
+        "prisma:push": "prisma db push"
     },
     "dependencies": {
         "@google/genai": "^2.7.0",

@@ -1,7 +1,8 @@
 import fs from "fs/promises";
 import path from "path";
 import type { GenerationImageInputs, ReferenceImageInput } from "@/lib/ai-image-inputs";
-import { extensionForMime, publicPathExists } from "@/lib/local-product-image-storage";
+import { extensionForMime } from "@/lib/product-image-storage";
+import { publicPathExists } from "@/lib/static-public-assets";
 import { isV7PromptVersion } from "@/lib/ai-image-prompt-versions";
 
 const STUDIO_PUBLIC_DIR = path.join(process.cwd(), "public", "images", "studio");

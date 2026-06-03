@@ -1,19 +1,9 @@
-import path from "path";
+import { getLegacyN3dWebPath } from "@/lib/product-image-path";
 
-/** Ruta canonica del render N3D (inborrable). */
+export { buildN3dObjectPath, isN3dProtectedImagePath } from "@/lib/product-image-path";
+export { resolveN3dRenderUrl } from "@/lib/product-image-storage";
+
+/** @deprecated Usar resolveN3dRenderUrl() o URL en BD. Ruta legacy en disco. */
 export function getN3dRenderWebPath(slug: string): string {
-    return `/images/products/${slug}.webp`;
-}
-
-export function isN3dProtectedImagePath(slug: string, imagePath: string): boolean {
-    const normalized = imagePath.trim();
-    if (!normalized.startsWith("/images/products/")) return false;
-    const base = path.basename(normalized).toLowerCase();
-    const expected = `${slug.toLowerCase()}.webp`;
-    return base === expected;
-}
-
-/** Imagen subida manualmente desde admin (borrable). */
-export function isManualUploadImagePath(imagePath: string): boolean {
-    return imagePath.startsWith("/images/uploads/");
+    return getLegacyN3dWebPath(slug);
 }

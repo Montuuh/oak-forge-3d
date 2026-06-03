@@ -27,13 +27,14 @@ export function extensionForContentType(contentType: string): string {
     return "png";
 }
 
+/** @deprecated Usar buildAiObjectPath en lib/product-image-storage.ts */
 export function buildStorageObjectPath(
     slug: string,
     imageId: string,
     contentType = "image/png",
 ): string {
     const ext = extensionForContentType(contentType);
-    return `${slug}/${imageId}.${ext}`;
+    return `${slug}/ai/${imageId}.${ext}`;
 }
 
 /** Crea el bucket si falta y lo deja publico (necesario para <img> y catalogo exportado). */

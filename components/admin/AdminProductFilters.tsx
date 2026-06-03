@@ -94,14 +94,6 @@ export function AdminProductFilters() {
                 </label>
 
                 <label className="text-sm">
-                    <span className="mb-1 block text-zinc-400">Piloto imagenes</span>
-                    <select name="pilot" defaultValue={val("pilot")} className={inputClass}>
-                        <option value="">Todos los productos</option>
-                        <option value="1">Solo piloto (10)</option>
-                    </select>
-                </label>
-
-                <label className="text-sm">
                     <span className="mb-1 block text-zinc-400">Destacado</span>
                     <select name="featured" defaultValue={val("featured")} className={inputClass}>
                         <option value="">Todos</option>

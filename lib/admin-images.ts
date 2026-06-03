@@ -6,36 +6,22 @@ import {
     pickCameraYawForPromptVersion,
     resolvePromptVersion,
 } from "@/lib/ai-image-prompt";
-import {
-    findQueueEntry,
-    getPilotSlugs,
-    readAiImageQueue,
-    trySyncQueueRemoveCandidate,
-    upsertQueueEntry,
-} from "@/lib/ai-image-queue-file";
-import type { QueueCandidate } from "@/lib/ai-image-queue-types";
 import { db } from "@/lib/db";
 import { generateLifestyleImageForAdmin } from "@/lib/lifestyle-image-generation";
-import { updateProductBySlug } from "@/lib/products-data-file";
 import { isValidStoredImagePath } from "@/lib/catalog-image";
 import { loadGenerationImageInputs } from "@/lib/ai-image-inputs";
 import { mergeStudioSceneIntoInputs } from "@/lib/studio-scene-reference";
 import { summarizeReferenceInputs } from "@/lib/gemini-image-parts";
 import { fetchRemoteImage } from "@/lib/safe-remote-image-fetch";
 import { collectLocalImageSources } from "@/lib/admin-local-images";
-import { isN3dProtectedImagePath } from "@/lib/n3d-product-image";
 import {
-    deleteLocalProductImageFile,
-    isAdminUploadedLocalPath,
-    saveLocalProductImageFile,
-} from "@/lib/local-product-image-storage";
-import {
-    buildStorageObjectPath,
-    deleteProductImageFile,
-    uploadProductImage,
-} from "@/lib/supabase-storage";
-import type { ProductAiAsset } from "@/types/product";
-
+    deleteStoredProductImage,
+    isManualUploadImagePath,
+    isN3dProtectedImagePath,
+    putAiImage,
+    putUploadImage,
+} from "@/lib/product-image-storage";
+import { isAiGeneratedStoragePath } from "@/lib/product-image-path";
 const MAX_CANDIDATES = 5;
 const MAX_LOCAL_IMAGES = 12;
 const MAX_LOCAL_UPLOAD_BYTES = 8 * 1024 * 1024;
@@ -54,116 +40,24 @@ export class N3dProtectedImageError extends Error {
     }
 }
 
-function syncQueueCandidate(
-    entrySlug: string,
-    candidate: QueueCandidate,
-    status: "generated_pending_review",
-    promptVersion: string,
-): void {
-    upsertQueueEntry((queue) => {
-        const entry = queue.items.find((item) => item.slug === entrySlug);
-        if (!entry) return;
-        entry.status = status;
-        entry.prompt_version = promptVersion;
-        const existing = entry.candidates.find((c) => c.id === candidate.id);
-        if (existing) {
-            Object.assign(existing, candidate);
-        } else {
-            entry.candidates.push(candidate);
-        }
-    });
-}
-
-function syncQueueApproval(slug: string, candidateId: string, reviewer: string): void {
-    const now = new Date().toISOString();
-    upsertQueueEntry((queue) => {
-        const entry = queue.items.find((item) => item.slug === slug);
-        if (!entry) return;
-        entry.status = "approved";
-        entry.approved_candidate_id = candidateId;
-        entry.reviewed_by = reviewer;
-        entry.reviewed_at = now;
-    });
-}
-
-function syncQueueRejection(slug: string, candidateId: string, reviewer: string, note?: string): void {
-    const now = new Date().toISOString();
-    upsertQueueEntry((queue) => {
-        const entry = queue.items.find((item) => item.slug === slug);
-        if (!entry) return;
-        if (entry.approved_candidate_id === candidateId) {
-            entry.approved_candidate_id = undefined;
-            entry.status = "generated_pending_review";
-        }
-        entry.reviewed_by = reviewer;
-        entry.reviewed_at = now;
-        if (note) entry.notes = note;
-    });
-}
-
-function syncProductsJsonOnApprove(
-    slug: string,
-    imagePath: string,
-    reviewer: string,
-    meta: { model?: string; promptVersion: string; generatedAt: string },
-): void {
-    const now = new Date().toISOString();
-    const updated = updateProductBySlug(slug, (product) => {
-        const aiAsset: ProductAiAsset = {
-            status: "approved",
-            source_model: meta.model,
-            prompt_version: meta.promptVersion,
-            generated_at: meta.generatedAt,
-            reviewed_at: now,
-            reviewed_by: reviewer,
-            approved_image_path: imagePath,
-        };
-        product.ai_asset = aiAsset;
-        product.image_source = "ai-generated";
-        product.image_path = imagePath;
-    });
-    if (!updated) return;
-}
-
-function syncProductsJsonOnReject(slug: string, reviewer: string, wasAiApproved: boolean): void {
-    const updated = updateProductBySlug(slug, (product) => {
-        if (wasAiApproved) {
-            product.ai_asset = {
-                status: "rejected",
-                reviewed_by: reviewer,
-                reviewed_at: new Date().toISOString(),
-            };
-        }
-        product.image_source = "n3d-local";
-    });
-    if (!updated) return;
-}
-
-function syncProductsJsonOnApproveLocal(slug: string, imagePath: string): void {
-    updateProductBySlug(slug, (product) => {
-        product.image_path = imagePath;
-        product.image_source = "n3d-local";
-    });
-}
-
-export async function getPilotProductsWithImages() {
-    const slugs = getPilotSlugs();
-    return db.product.findMany({
-        where: { slug: { in: slugs } },
-        include: {
-            images: { orderBy: { createdAt: "desc" } },
-        },
-        orderBy: { name: "asc" },
-    });
-}
-
 export async function ensureRealPhotoRecordsForProduct(productId: string, slug: string): Promise<void> {
     await db.productImage.updateMany({
         where: { productId, origin: "ai_generated" },
         data: { useAsReference: false },
     });
 
-    const sources = collectLocalImageSources(slug);
+    const staleReferences = await db.productImage.findMany({
+        where: { productId, origin: "real_photo" },
+        select: { id: true, imagePath: true },
+    });
+    const staleIds = staleReferences
+        .filter((row) => isAiGeneratedStoragePath(slug, row.imagePath))
+        .map((row) => row.id);
+    if (staleIds.length > 0) {
+        await db.productImage.deleteMany({ where: { id: { in: staleIds } } });
+    }
+
+    const sources = await collectLocalImageSources(slug);
     if (sources.length === 0) return;
 
     const existing = await db.productImage.findMany({
@@ -173,6 +67,7 @@ export async function ensureRealPhotoRecordsForProduct(productId: string, slug: 
     const byPath = new Map(existing.map((row) => [row.imagePath.trim(), row]));
 
     for (const source of sources) {
+        if (isAiGeneratedStoragePath(slug, source.imagePath)) continue;
         const prior = byPath.get(source.imagePath);
         if (prior) continue;
         const created = await db.productImage.create({
@@ -250,7 +145,7 @@ export async function uploadLocalProductImage(
     });
 
     try {
-        const webPath = await saveLocalProductImageFile(
+        const publicUrl = await putUploadImage(
             product.slug,
             imageRow.id,
             file.buffer,
@@ -258,7 +153,7 @@ export async function uploadLocalProductImage(
         );
         return db.productImage.update({
             where: { id: imageRow.id },
-            data: { imagePath: webPath, useAsReference: true },
+            data: { imagePath: publicUrl, useAsReference: true },
         });
     } catch (error) {
         await db.productImage.delete({ where: { id: imageRow.id } });
@@ -342,7 +237,7 @@ export async function generateCandidateForProduct(
         const paths = markedRefs.map((img) => img.imagePath).join(", ");
         throw new Error(
             `Hay referencias marcadas pero no se encontraron los archivos en disco: ${paths}. ` +
-                "Comprueba public/images/products/ o public/images/uploads/.",
+                "Comprueba que las URLs de referencia en Supabase Storage sean accesibles.",
         );
     }
 
@@ -376,35 +271,17 @@ export async function generateCandidateForProduct(
     });
 
     try {
-        const objectPath = buildStorageObjectPath(
+        const publicUrl = await putAiImage(
             product.slug,
             imageRow.id,
-            generated.contentType,
-        );
-        const publicUrl = await uploadProductImage(
-            objectPath,
             generated.buffer,
             generated.contentType,
         );
 
-        const updated = await db.productImage.update({
+        return db.productImage.update({
             where: { id: imageRow.id },
             data: { imagePath: publicUrl },
         });
-
-        const queueCandidate: QueueCandidate = {
-            id: updated.id,
-            image_path: publicUrl,
-            prompt,
-            model: generated.model,
-            generated_at: updated.createdAt.toISOString(),
-        };
-
-        if (findQueueEntry(product.slug)) {
-            syncQueueCandidate(product.slug, queueCandidate, "generated_pending_review", promptVersion);
-        }
-
-        return updated;
     } catch (error) {
         await db.productImage.delete({ where: { id: imageRow.id } });
         throw error;
@@ -431,17 +308,12 @@ export async function deleteProductImage(imageId: string) {
     let storageDeleted = false;
     if (isValidStoredImagePath(image.imagePath)) {
         try {
-            if (image.imagePath.startsWith("http")) {
-                await deleteProductImageFile(image.imagePath);
-                storageDeleted = true;
-            } else if (
-                image.origin === "real_photo" &&
-                isAdminUploadedLocalPath(image.imagePath, image.product.slug)
-            ) {
-                await deleteLocalProductImageFile(image.imagePath, image.product.slug);
+            if (image.origin === "ai_generated" || isManualUploadImagePath(image.product.slug, image.imagePath)) {
+                await deleteStoredProductImage(image.imagePath, image.product.slug);
                 storageDeleted = true;
             }
         } catch (error) {
+            if (error instanceof N3dProtectedImageError) throw error;
             const detail = error instanceof Error ? error.message : String(error);
             throw new Error(`No se pudo borrar el archivo: ${detail}`);
         }
@@ -469,20 +341,6 @@ export async function deleteProductImage(imageId: string) {
 
         await tx.productImage.delete({ where: { id: imageId } });
     });
-
-    trySyncQueueRemoveCandidate(image.product.slug, imageId);
-
-    if (wasApproved) {
-        try {
-            syncProductsJsonOnReject(
-                image.product.slug,
-                getAdminReviewerName(),
-                image.origin === "ai_generated",
-            );
-        } catch (error) {
-            console.warn("products.json no actualizado tras delete:", error);
-        }
-    }
 
     return {
         deletedId: imageId,
@@ -536,19 +394,6 @@ export async function approveProductImage(imageId: string) {
         });
     });
 
-    if (image.origin === "ai_generated") {
-        if (findQueueEntry(image.product.slug)) {
-            syncQueueApproval(image.product.slug, imageId, reviewer);
-        }
-        syncProductsJsonOnApprove(image.product.slug, image.imagePath, reviewer, {
-            model: image.sourceModel ?? undefined,
-            promptVersion: image.promptVersion ?? getDefaultPromptVersion(),
-            generatedAt: image.createdAt.toISOString(),
-        });
-    } else if (image.origin === "real_photo") {
-        syncProductsJsonOnApproveLocal(image.product.slug, image.imagePath);
-    }
-
     if (image.product.isVisibleInCatalog) {
         revalidatePath("/");
         revalidatePath(`/products/${image.product.slug}`);
@@ -599,24 +444,7 @@ export async function rejectProductImage(imageId: string, notes?: string) {
         });
     }
 
-    if (findQueueEntry(image.product.slug)) {
-        syncQueueRejection(image.product.slug, imageId, reviewer, notes);
-    }
-
-    if (image.status === "approved") {
-        syncProductsJsonOnReject(
-            image.product.slug,
-            reviewer,
-            image.origin === "ai_generated",
-        );
-    }
-
     return db.productImage.findUnique({ where: { id: imageId } });
-}
-
-export function getPilotQueueSummary() {
-    const queue = readAiImageQueue();
-    return queue.items;
 }
 
 export async function setProductImageUseAsReference(imageId: string, useAsReference: boolean) {

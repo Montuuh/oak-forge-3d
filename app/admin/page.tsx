@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { AdminCatalogExport } from "@/components/admin/AdminCatalogExport";
 
 export const dynamic = "force-dynamic";
 
@@ -38,13 +37,6 @@ export default function AdminPage() {
                             >
                                 Gestionar productos
                             </Link>
-                            <Link
-                                href="/admin/products?image=needs_review&pilot=1"
-                                className="rounded-xl border border-white/15 px-4 py-2 text-sm font-medium text-zinc-200 transition hover:bg-white/10"
-                            >
-                                Revision imagenes (piloto)
-                            </Link>
-                            <AdminCatalogExport compact />
                         </div>
                     </div>
 

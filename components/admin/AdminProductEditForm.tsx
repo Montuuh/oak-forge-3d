@@ -1,4 +1,4 @@
-import { PRODUCT_STATUS_OPTIONS } from "@/lib/admin-product-constants";
+import { AdminProductCatalogFields } from "@/components/admin/AdminProductCatalogFields";
 import type { Product, ProductImage } from "@prisma/client";
 
 const fieldClass =
@@ -39,16 +39,10 @@ export function AdminProductEditForm({ product, action }: AdminProductEditFormPr
                         <input name="n3dSlug" defaultValue={product.n3dSlug ?? ""} className={fieldClass} />
                     </label>
 
-                    <label className="text-sm">
-                        <span className="mb-1 block text-zinc-400">Estado</span>
-                        <select name="status" defaultValue={product.status} className={fieldClass}>
-                            {PRODUCT_STATUS_OPTIONS.map((s) => (
-                                <option key={s} value={s}>
-                                    {s}
-                                </option>
-                            ))}
-                        </select>
-                    </label>
+                    <AdminProductCatalogFields
+                        defaultVisible={product.isVisibleInCatalog}
+                        defaultStatus={product.status}
+                    />
 
                     <label className="text-sm">
                         <span className="mb-1 block text-zinc-400">Categoria</span>
@@ -56,26 +50,24 @@ export function AdminProductEditForm({ product, action }: AdminProductEditFormPr
                     </label>
 
                     <label className="text-sm">
-                        <span className="mb-1 block text-zinc-400">Precio (centimos)</span>
-                        <input
-                            type="number"
-                            name="priceCents"
-                            defaultValue={product.priceCents ?? ""}
-                            className={fieldClass}
-                        />
-                    </label>
-
-                    <label className="flex items-center gap-2 text-sm md:col-span-2">
-                        <input
-                            type="checkbox"
-                            name="isVisibleInCatalog"
-                            defaultChecked={product.isVisibleInCatalog}
-                            className="rounded"
-                        />
-                        <span className="text-zinc-300">
-                            Visible en catalogo publico (tras guardar, ejecuta{" "}
-                            <code className="text-zinc-400">npm run catalog:export</code>)
-                        </span>
+                        <span className="mb-1 block text-zinc-400">Precio (EUR)</span>
+                        <div className="relative">
+                            <input
+                                type="number"
+                                name="priceEuros"
+                                step="0.01"
+                                min="0"
+                                defaultValue={
+                                    product.priceCents != null
+                                        ? (product.priceCents / 100).toFixed(2)
+                                        : ""
+                                }
+                                className={`${fieldClass} pr-8`}
+                            />
+                            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-zinc-500">
+                                €
+                            </span>
+                        </div>
                     </label>
 
                     <label className="flex items-center gap-2 text-sm">

@@ -5,7 +5,10 @@ import {
     IMAGE_SEARCH_VENDOR_READYTOPRINT3D,
 } from "@/lib/image-search-query";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+
+const SEARCH_RESULT_LIMIT = 50;
+const PAGE_SIZE = 10;
 
 type SearchCandidate = {
     id: string;
@@ -44,10 +47,17 @@ export function AdminLocalImageSearch({
     const [query, setQuery] = useState(defaultQuery);
     const [includeReadyToPrint3d, setIncludeReadyToPrint3d] = useState(true);
     const [candidates, setCandidates] = useState<SearchCandidate[]>([]);
+    const [page, setPage] = useState(0);
     const [searching, setSearching] = useState(false);
     const [importingId, setImportingId] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [lastQuery, setLastQuery] = useState<string | null>(null);
+
+    const totalPages = Math.max(1, Math.ceil(candidates.length / PAGE_SIZE));
+    const pageCandidates = useMemo(() => {
+        const start = page * PAGE_SIZE;
+        return candidates.slice(start, start + PAGE_SIZE);
+    }, [candidates, page]);
 
     async function runSearch() {
         setError(null);
@@ -68,6 +78,7 @@ export function AdminLocalImageSearch({
                 throw new Error(payload.error || `Error ${response.status}`);
             }
             setCandidates(payload.candidates ?? []);
+            setPage(0);
             setLastQuery(payload.query ?? effectiveQuery);
             setOpen(true);
         } catch (err) {
@@ -97,6 +108,7 @@ export function AdminLocalImageSearch({
             }
             setOpen(false);
             setCandidates([]);
+            setPage(0);
             router.refresh();
         } catch (err) {
             setError(err instanceof Error ? err.message : "Error al importar.");
@@ -104,6 +116,13 @@ export function AdminLocalImageSearch({
             setImportingId(null);
         }
     }
+
+    function goToPage(next: number) {
+        setPage(Math.min(Math.max(0, next), totalPages - 1));
+    }
+
+    const rangeStart = candidates.length === 0 ? 0 : page * PAGE_SIZE + 1;
+    const rangeEnd = Math.min((page + 1) * PAGE_SIZE, candidates.length);
 
     return (
         <div className="space-y-3">
@@ -138,7 +157,7 @@ export function AdminLocalImageSearch({
                     onClick={() => void runSearch()}
                     className="rounded-lg bg-violet-700 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-violet-600 disabled:opacity-50"
                 >
-                    {searching ? "Buscando…" : "Buscar 10 candidatos"}
+                    {searching ? "Buscando…" : `Buscar ${SEARCH_RESULT_LIMIT} candidatos`}
                 </button>
             </div>
 
@@ -150,9 +169,10 @@ export function AdminLocalImageSearch({
 
             {open && candidates.length > 0 && (
                 <div className="rounded-xl border border-white/10 bg-zinc-900/40 p-3">
-                    <div className="mb-3 flex items-center justify-between gap-2">
+                    <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                         <p className="text-sm text-zinc-400">
-                            Resultados para <strong className="text-zinc-200">{lastQuery}</strong> — elige una
+                            Resultados para <strong className="text-zinc-200">{lastQuery}</strong> —{" "}
+                            {candidates.length} candidatos, mostrando {rangeStart}–{rangeEnd}. Elige una
                             para subirla como imagen local (referencia de forma).
                         </p>
                         <button
@@ -163,8 +183,33 @@ export function AdminLocalImageSearch({
                             Cerrar
                         </button>
                     </div>
+
+                    <div className="mb-3 flex items-center justify-center gap-3">
+                        <button
+                            type="button"
+                            disabled={page <= 0 || importingId !== null}
+                            onClick={() => goToPage(page - 1)}
+                            className="rounded-lg border border-white/15 px-3 py-1.5 text-sm text-zinc-200 transition hover:bg-white/10 disabled:opacity-40"
+                            aria-label="Pagina anterior"
+                        >
+                            ← Anterior
+                        </button>
+                        <span className="text-sm text-zinc-400">
+                            Pagina {page + 1} de {totalPages}
+                        </span>
+                        <button
+                            type="button"
+                            disabled={page >= totalPages - 1 || importingId !== null}
+                            onClick={() => goToPage(page + 1)}
+                            className="rounded-lg border border-white/15 px-3 py-1.5 text-sm text-zinc-200 transition hover:bg-white/10 disabled:opacity-40"
+                            aria-label="Pagina siguiente"
+                        >
+                            Siguiente →
+                        </button>
+                    </div>
+
                     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-                        {candidates.map((candidate) => (
+                        {pageCandidates.map((candidate) => (
                             <div
                                 key={candidate.id}
                                 className="overflow-hidden rounded-lg border border-white/10 bg-zinc-950/50"

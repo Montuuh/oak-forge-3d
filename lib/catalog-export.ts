@@ -1,15 +1,7 @@
-import * as fs from "fs";
-import * as path from "path";
 import type { PrismaClient } from "@prisma/client";
 import { CATALOG_PLACEHOLDER_IMAGE_PATH, isValidStoredImagePath } from "@/lib/catalog-image";
 import { db } from "@/lib/db";
 import type { Product, ProductsData } from "@/types/product";
-
-export const CATALOG_PUBLIC_JSON_PATH = path.join(
-    process.cwd(),
-    "data",
-    "catalog-public.json",
-);
 
 type ProductWithImages = Awaited<
     ReturnType<PrismaClient["product"]["findMany"]>
@@ -113,34 +105,5 @@ export async function buildPublicCatalogData(): Promise<ProductsData> {
         last_updated: new Date().toISOString(),
         total_products: products.length,
         products,
-    };
-}
-
-export type CatalogExportResult = {
-    productCount: number;
-    placeholderCount: number;
-    outputPath: string;
-    lastUpdated: string;
-};
-
-export async function exportCatalogPublicJson(
-    outputPath = CATALOG_PUBLIC_JSON_PATH,
-): Promise<CatalogExportResult> {
-    const payload = await buildPublicCatalogData();
-    const dir = path.dirname(outputPath);
-    if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-    }
-    fs.writeFileSync(outputPath, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
-
-    const placeholderCount = payload.products.filter(
-        (p) => p.image_path === CATALOG_PLACEHOLDER_IMAGE_PATH,
-    ).length;
-
-    return {
-        productCount: payload.products.length,
-        placeholderCount,
-        outputPath,
-        lastUpdated: payload.last_updated,
     };
 }

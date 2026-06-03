@@ -2,7 +2,7 @@ import { AdminImageActions } from "@/components/admin/AdminImageActions";
 import { ImageReferenceToggle } from "@/components/admin/ImageReferenceToggle";
 import { getAdminImageDisplayUrl } from "@/lib/admin-image-url";
 import { isValidStoredImagePath } from "@/lib/catalog-image";
-import { isN3dProtectedImagePath } from "@/lib/n3d-product-image";
+import { isN3dProtectedImagePath } from "@/lib/product-image-path";
 
 type ImageRow = {
     id: string;
@@ -22,6 +22,7 @@ type ImageCandidateCardProps = {
     productSlug: string;
     originLabel?: string;
     fileOnDisk?: boolean | null;
+    variant?: "reference" | "ai";
 };
 
 const STATUS_LABEL: Record<ImageRow["status"], string> = {
@@ -36,6 +37,7 @@ export function ImageCandidateCard({
     productSlug,
     originLabel,
     fileOnDisk = null,
+    variant = "ai",
 }: ImageCandidateCardProps) {
     const isN3dProtected =
         image.origin === "real_photo" && isN3dProtectedImagePath(productSlug, image.imagePath);
@@ -90,10 +92,12 @@ export function ImageCandidateCard({
                 />
             )}
 
-            <p className="mb-2 line-clamp-2 text-xs text-zinc-500">
-                {image.promptVersion || "sin version"} ·{" "}
-                {new Date(image.createdAt).toLocaleString("es-ES")}
-            </p>
+            {variant === "ai" && (
+                <p className="mb-2 line-clamp-2 text-xs text-zinc-500">
+                    {image.promptVersion || "sin versión"} ·{" "}
+                    {new Date(image.createdAt).toLocaleString("es-ES")}
+                </p>
+            )}
 
             {image.notes && <p className="mb-2 text-xs text-zinc-400">{image.notes}</p>}
 

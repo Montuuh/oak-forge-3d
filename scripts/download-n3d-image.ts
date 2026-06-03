@@ -1,16 +1,26 @@
 import fs from "fs";
 import path from "path";
+import { putN3dRender } from "@/lib/product-image-storage";
 
 const API_BASE_URL = "https://n3dmelbourne.com/api/v1";
 
-function loadN3dApiKey(): string {
+function loadEnvLocal(): void {
     const envPath = path.join(process.cwd(), ".env.local");
+    if (!fs.existsSync(envPath)) return;
     const env = fs.readFileSync(envPath, "utf8");
-    const keyMatch = env.match(/N3D_API_KEY\s*=\s*([^\s\r\n]+)/);
-    if (!keyMatch) {
-        throw new Error("N3D_API_KEY no encontrada en .env.local");
+    for (const line of env.split("\n")) {
+        const match = line.match(/^([A-Z_][A-Z0-9_]*)=(.*)$/);
+        if (!match) continue;
+        const key = match[1];
+        const value = match[2].trim().replace(/^["']|["']$/g, "");
+        if (!process.env[key]) process.env[key] = value;
     }
-    return keyMatch[1].trim();
+}
+
+function loadN3dApiKey(): string {
+    const key = process.env.N3D_API_KEY?.trim();
+    if (key) return key;
+    throw new Error("N3D_API_KEY no encontrada en .env.local");
 }
 
 async function n3dApiRequest<T>(endpoint: string, apiKey: string): Promise<T> {
@@ -46,13 +56,11 @@ async function n3dApiRequest<T>(endpoint: string, apiKey: string): Promise<T> {
 }
 
 async function main() {
+    loadEnvLocal();
     const slug = process.argv[2]?.trim() || "0001-bulbasaur";
     const apiKey = loadN3dApiKey();
 
-    const design = await n3dApiRequest<{ image_url?: string }>(
-        `/designs/${slug}`,
-        apiKey,
-    );
+    const design = await n3dApiRequest<{ image_url?: string }>(`/designs/${slug}`, apiKey);
     const imgUrl = design.image_url?.trim();
     if (!imgUrl) {
         throw new Error(`Sin image_url para ${slug}`);
@@ -64,21 +72,15 @@ async function main() {
     }
 
     const buffer = Buffer.from(await imgRes.arrayBuffer());
-    const dir = path.join(process.cwd(), "public", "images", "products");
-    fs.mkdirSync(dir, { recursive: true });
-
-    const ext = path.extname(new URL(imgUrl).pathname) || ".webp";
-    const filename = `${slug}${ext}`;
-    const diskPath = path.join(dir, filename);
-    fs.writeFileSync(diskPath, buffer);
+    const mimeType = imgRes.headers.get("content-type") || "image/webp";
+    const publicUrl = await putN3dRender(slug, buffer, mimeType);
 
     console.log(
         JSON.stringify(
             {
                 ok: true,
                 slug,
-                diskPath,
-                webPath: `/images/products/${filename}`,
+                publicUrl,
                 bytes: buffer.length,
             },
             null,
