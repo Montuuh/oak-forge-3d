@@ -93,6 +93,7 @@ export async function getProductWithImagesBySlug(slug: string) {
         where: { slug },
         include: {
             images: { orderBy: { createdAt: "desc" } },
+            filaments: { orderBy: { sortOrder: "asc" } },
         },
     });
     if (!product) {
@@ -105,6 +106,7 @@ export async function getProductWithImagesBySlug(slug: string) {
         where: { slug },
         include: {
             images: { orderBy: { createdAt: "desc" } },
+            filaments: { orderBy: { sortOrder: "asc" } },
         },
     });
 }

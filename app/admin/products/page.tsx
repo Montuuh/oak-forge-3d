@@ -58,24 +58,42 @@ export default async function AdminProductsPage({ searchParams = {} }: AdminProd
                 : "No se pudo cargar productos. Revisa DATABASE_URL.";
     }
 
-    const flash = typeof searchParams.saved === "string" ? "saved" : null;
+    const flash =
+        typeof searchParams.saved === "string"
+            ? "saved"
+            : typeof searchParams.created === "string"
+              ? "created"
+              : null;
     const flashError =
         typeof searchParams.error === "string" ? searchParams.error : null;
 
     return (
         <div className="py-8 md:py-12">
             <div className="container mx-auto px-4 md:px-6">
-                <div className="mb-6 max-w-3xl">
-                    <h1 className="font-display text-3xl font-bold">Productos</h1>
-                    <p className="mt-2 text-zinc-400">
-                        Selecciona un producto para editar datos, imagenes AI y visibilidad. El sitio
-                        publico lee productos visibles desde la BD al abrir cada pagina.
-                    </p>
+                <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+                    <div className="max-w-3xl">
+                        <h1 className="font-display text-3xl font-bold">Productos</h1>
+                        <p className="mt-2 text-zinc-400">
+                            Crear, duplicar, archivar o editar productos. El sitio publico solo muestra
+                            los marcados como visibles.
+                        </p>
+                    </div>
+                    <Link
+                        href="/admin/products/new"
+                        className="rounded-xl bg-oak-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-oak-500"
+                    >
+                        + Nuevo producto
+                    </Link>
                 </div>
 
                 {flash === "saved" && (
                     <div className="mb-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-sm text-emerald-100">
                         Cambios guardados.
+                    </div>
+                )}
+                {flash === "created" && (
+                    <div className="mb-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-sm text-emerald-100">
+                        Producto creado.
                     </div>
                 )}
 

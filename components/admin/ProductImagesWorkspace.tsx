@@ -34,6 +34,8 @@ type ProductImagesWorkspaceProps = {
     defaultSearchQuery: string;
     studioSceneStatus: StudioSceneStatus;
     generationProviderSummary: string;
+    /** Sin contenedor ni titulo (p. ej. dentro de seccion colapsable). */
+    bare?: boolean;
 };
 
 function isReferenceImage(slug: string, image: ProductImage): boolean {
@@ -49,6 +51,7 @@ export function ProductImagesWorkspace({
     defaultSearchQuery,
     studioSceneStatus,
     generationProviderSummary,
+    bare = false,
 }: ProductImagesWorkspaceProps) {
     const [searchOpen, setSearchOpen] = useState(false);
     const [promptVersion, setPromptVersion] = useState(getDefaultPromptVersion);
@@ -71,18 +74,7 @@ export function ProductImagesWorkspace({
         (img) => img.status === "approved" && isValidStoredImagePath(img.imagePath),
     );
     const brokenAi = aiImages.filter((img) => !isValidStoredImagePath(img.imagePath)).length;
-    return (
-        <section className="glass rounded-2xl border border-white/10 p-4 md:p-6">
-            <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
-                <div>
-                    <h2 className="text-lg font-semibold">Imágenes</h2>
-                    <p className="mt-1 text-xs text-zinc-500">
-                        Referencias {referenceCount} · Candidatos AI {activeCandidates}/5
-                        {approvedAi || approvedRef ? " · Principal asignada" : " · Sin principal"}
-                    </p>
-                </div>
-            </div>
-
+    const inner = (
             <div className="space-y-6">
                 <div>
                     <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-zinc-400">
@@ -194,6 +186,24 @@ export function ProductImagesWorkspace({
                     )}
                 </div>
             </div>
+    );
+
+    if (bare) {
+        return inner;
+    }
+
+    return (
+        <section className="glass rounded-2xl border border-white/10 p-4 md:p-6">
+            <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+                <div>
+                    <h2 className="text-lg font-semibold">Imágenes</h2>
+                    <p className="mt-1 text-xs text-zinc-500">
+                        Referencias {referenceCount} · Candidatos AI {activeCandidates}/5
+                        {approvedAi || approvedRef ? " · Principal asignada" : " · Sin principal"}
+                    </p>
+                </div>
+            </div>
+            {inner}
         </section>
     );
 }

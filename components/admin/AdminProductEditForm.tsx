@@ -1,24 +1,31 @@
 import { AdminProductCatalogFields } from "@/components/admin/AdminProductCatalogFields";
-import type { Product, ProductImage } from "@prisma/client";
+import { AdminProductFilamentsSection } from "@/components/admin/AdminProductFilamentsSection";
+import type { Product, ProductFilament, ProductImage } from "@prisma/client";
 
 const fieldClass =
     "w-full rounded-lg border border-white/10 bg-zinc-900/70 px-3 py-2 text-sm text-zinc-100";
 
-type ProductWithImages = Product & { images: ProductImage[] };
+type ProductWithImages = Product & {
+    images: ProductImage[];
+    filaments: ProductFilament[];
+};
 
 type AdminProductEditFormProps = {
     product: ProductWithImages;
     action: (formData: FormData) => Promise<void>;
+    bare?: boolean;
 };
 
-export function AdminProductEditForm({ product, action }: AdminProductEditFormProps) {
+export function AdminProductEditForm({ product, action, bare = false }: AdminProductEditFormProps) {
+    const formClass = bare ? "space-y-6" : "glass space-y-6 rounded-2xl border border-white/10 p-4 md:p-6";
+
     return (
-        <form action={action} className="glass space-y-6 rounded-2xl border border-white/10 p-4 md:p-6">
+        <form action={action} className={formClass}>
             <input type="hidden" name="id" value={product.id} />
             <input type="hidden" name="slug" value={product.slug} />
 
             <div>
-                <h2 className="mb-4 text-lg font-semibold">Datos generales</h2>
+                {!bare && <h2 className="mb-4 text-lg font-semibold">Datos generales</h2>}
                 <div className="grid gap-3 md:grid-cols-2">
                     <label className="text-sm md:col-span-2">
                         <span className="mb-1 block text-zinc-400">Nombre</span>
@@ -145,6 +152,8 @@ export function AdminProductEditForm({ product, action }: AdminProductEditFormPr
                     </label>
                 </div>
             </div>
+
+            <AdminProductFilamentsSection filaments={product.filaments} />
 
             <div>
                 <h2 className="mb-4 text-lg font-semibold">Pokemon y etiquetas</h2>

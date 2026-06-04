@@ -1,17 +1,22 @@
 # Product backlog — Oak's Forge 3D
 
-## Catálogo y ficha
+**Fuente de verdad:** tabla `backlog_tasks` en Postgres (Supabase) · **Admin:** [/admin/backlog](/admin/backlog)
 
-- Refinar campos del **catálogo general** (¿solo precio?).
-- Refinar campos de la **ficha de producto**.
+## Categorías principales
 
-## Comercio y promociones
+| Categoría | Ejemplos |
+|-----------|----------|
+| Conversión / Venta | Instagram real, CTA con slug, WhatsApp, disponibilidad |
+| UI/UX | Paginación, filtros, galería, menú móvil |
+| SEO / Marketing | Sitemap, OG, newsletter, analytics |
+| Contenido / Legal | FAQ, envíos, aviso legal, cookies |
+| Comercio | Bundles, carrito, Stripe (largo plazo) |
+| Admin / Infra | CRUD productos, dashboard |
 
-- **Bundles**
-- **Lista de favoritos** con descuentos escalonados (estilo Bambu Store / AliExpress)
-- **RNG en pedido:** a partir de X €, sorteo (freebie / nada / % descuento / …)
-- **Soportes para Pokéballs** — apartado de venta dedicado
+## Quick wins sugeridos (alta prioridad)
 
-## AI (implementado / en curso)
-
-- **v7** — estudio fijo (mesa roble, gotelé, luz estable) + referencia de escena subible
+1. `social-urls-real` — URLs reales de redes
+2. `show-availability` — badge Disponible/Agotado
+3. `long-description-public` — descripción larga en ficha
+4. `cta-dm-slug` — DM con slug del producto
+5. `seo-foundation` — sitemap + OG básico

@@ -19,6 +19,7 @@ type ProductImagesPanelProps = {
     slug: string;
     images: ProductImage[];
     defaultSearchQuery: string;
+    bare?: boolean;
 };
 
 export function ProductImagesPanel({
@@ -26,6 +27,7 @@ export function ProductImagesPanel({
     slug,
     images,
     defaultSearchQuery,
+    bare = false,
 }: ProductImagesPanelProps) {
     const studioSceneStatus = getStudioSceneStatus();
     const generationProviderSummary = getImageGenerationProviderSummary();
@@ -38,6 +40,7 @@ export function ProductImagesPanel({
             defaultSearchQuery={defaultSearchQuery}
             studioSceneStatus={studioSceneStatus}
             generationProviderSummary={generationProviderSummary}
+            bare={bare}
         />
     );
 }

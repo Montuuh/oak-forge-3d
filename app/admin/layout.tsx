@@ -13,6 +13,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                             <Link href="/admin/products" className="hover:text-white transition-colors">
                                 Productos
                             </Link>
+                            <Link href="/admin/backlog" className="hover:text-white transition-colors">
+                                Backlog
+                            </Link>
                         </nav>
                     </div>
                     <form action="/api/admin/logout" method="POST">

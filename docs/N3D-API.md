@@ -35,7 +35,8 @@ https://n3dmelbourne.com/api/v1
 
 ## Rate Limits
 
-- 30 requests per minute per API key
+- Depende del tier Patreon (p. ej. **casual: 5/min**, tiers superiores pueden permitir más)
+- En Oak Forge 3D: `N3D_API_REQUESTS_PER_MIN` en `.env.local` (por defecto `5`)
 - Rate limit info included in response headers:
   - `X-RateLimit-Limit` — Maximum requests per window
   - `X-RateLimit-Remaining` — Requests remaining

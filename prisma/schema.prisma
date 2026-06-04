@@ -45,10 +45,28 @@ model Product {
   featured            Boolean       @default(false)
   available           Boolean       @default(true)
   primaryImageId      String?
+  n3dSyncedAt         DateTime?
   images              ProductImage[]
+  filaments           ProductFilament[]
   taxonomyLinks       ProductTaxonomy[]
   createdAt           DateTime      @default(now())
   updatedAt           DateTime      @updatedAt
+}
+
+model ProductFilament {
+  id              String   @id @default(cuid())
+  productId       String
+  product         Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  n3dFilamentId   Int?
+  color           String
+  series          String
+  weightGrams     Float
+  sortOrder       Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([productId])
+  @@map("product_filaments")
 }
 
 model ProductImage {
@@ -90,4 +108,34 @@ model ProductTaxonomy {
 
   @@id([productId, taxonomyId])
   @@index([taxonomyId])
+}
+
+enum BacklogStatus {
+  pending
+  in_progress
+  done
+  cancelled
+}
+
+enum BacklogPriority {
+  low
+  medium
+  high
+}
+
+model BacklogTask {
+  id          String          @id
+  title       String
+  description String?
+  category    String
+  status      BacklogStatus   @default(pending)
+  priority    BacklogPriority @default(medium)
+  createdAt   DateTime
+  updatedAt   DateTime
+
+  @@index([status])
+  @@index([priority])
+  @@index([category])
+  @@index([status, priority])
+  @@map("backlog_tasks")
 }

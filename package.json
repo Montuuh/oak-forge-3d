@@ -10,6 +10,8 @@
         "start": "next start",
         "lint": "next lint",
         "sync:n3d-image": "tsx scripts/download-n3d-image.ts",
+        "sync:n3d:overwrite-all": "tsx scripts/sync-n3d-overwrite-all.ts",
+        "sync:n3d:import-new": "tsx scripts/sync-n3d-import-new.ts",
         "prisma:generate": "prisma generate",
         "prisma:push": "prisma db push"
     },
