@@ -2,6 +2,10 @@ import { GoogleGenAI } from "@google/genai";
 import type { GenerationImageInputs } from "@/lib/ai-image-inputs";
 import { buildGeminiImageGenerationParts } from "@/lib/gemini-image-parts";
 import { buildGeminiImageGenerateContentConfig } from "@/lib/gemini-image-generation-config";
+import {
+    hasGcpServiceAccountEnv,
+    loadGcpServiceAccountCredentials,
+} from "@/lib/gcp-credentials";
 
 export type VertexGeneratedImage = {
     buffer: Buffer;
@@ -121,10 +125,14 @@ export function createVertexGenAIClient(config?: Pick<VertexImageConfig, "projec
         throw new Error("Falta GOOGLE_CLOUD_PROJECT para Vertex AI.");
     }
 
+    const credentials = loadGcpServiceAccountCredentials();
     return new GoogleGenAI({
         vertexai: true,
         project,
         location,
+        ...(credentials
+            ? { googleAuthOptions: { credentials } }
+            : {}),
     });
 }
 
@@ -150,9 +158,10 @@ function wrapVertexError(
         );
     }
     if (/Could not load the default credentials/i.test(raw)) {
-        return new Error(
-            "Sin credenciales GCP. Ejecuta `gcloud auth application-default login` o define GOOGLE_APPLICATION_CREDENTIALS.",
-        );
+        const vercelHint = hasGcpServiceAccountEnv()
+            ? " Revisa que GCP_SERVICE_ACCOUNT_JSON sea valido."
+            : " En local: `gcloud auth application-default login`. En Vercel: variable GCP_SERVICE_ACCOUNT_JSON con el JSON de la service account (rol Vertex AI User).";
+        return new Error(`Sin credenciales GCP.${vercelHint}`);
     }
     if (/PERMISSION_DENIED|403/i.test(raw)) {
         return new Error(

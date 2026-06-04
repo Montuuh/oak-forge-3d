@@ -16,11 +16,9 @@ Ruta **paralela** a AI Studio (`lib/google-ai-images.ts`). Usa **billing GCP** (
 2. [Activar billing](https://console.cloud.google.com/billing) en esa cuenta.
 3. Activar **Vertex AI API**: `aiplatform.googleapis.com`
 4. Aplicar $10/mes en [My Benefits](https://developers.google.com/profile/benefits) → misma billing account.
-5. Autenticacion local (elige una):
-   ```bash
-   gcloud auth application-default login
-   ```
-   o service account JSON → `GOOGLE_APPLICATION_CREDENTIALS=ruta/al/sa.json`
+5. Autenticacion:
+   - **Local:** `gcloud auth application-default login`
+   - **Vercel / CI:** service account JSON en la variable de entorno `GCP_SERVICE_ACCOUNT_JSON` (contenido completo del archivo `.json`, rol **Vertex AI User**). No uses `gcloud` en produccion.
 
 ## Variables (.env.local)
 
@@ -75,7 +73,7 @@ Prueba desde **Admin → ficha de producto → Generar candidato AI** (MCP brows
 
 | Error | Accion |
 |-------|--------|
-| `Could not load the default credentials` | `gcloud auth application-default login` |
+| `Could not load the default credentials` | Local: `gcloud auth application-default login`. Vercel: `GCP_SERVICE_ACCOUNT_JSON` en Environment Variables |
 | `PERMISSION_DENIED` | Rol **Vertex AI User** + API habilitada |
 | `billing` | Billing activo en el proyecto |
 | Modelo 404 | Cambiar `VERTEX_IMAGE_MODEL` en `.env.local` |
