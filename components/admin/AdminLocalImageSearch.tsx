@@ -173,7 +173,8 @@ export function AdminLocalImageSearch({
                         <p className="text-sm text-zinc-400">
                             Resultados para <strong className="text-zinc-200">{lastQuery}</strong> —{" "}
                             {candidates.length} candidatos, mostrando {rangeStart}–{rangeEnd}. Elige una
-                            para subirla como imagen local (referencia de forma).
+                            para subirla como imagen local (referencia de forma). Si Instagram falla,
+                            copia la URL directa de la foto (cdninstagram / scontent) o sube el archivo.
                         </p>
                         <button
                             type="button"

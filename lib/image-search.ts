@@ -1,4 +1,5 @@
 import { createHash } from "crypto";
+import { pickSearchResultImageUrl } from "@/lib/remote-image-url";
 
 export type ImageSearchCandidate = {
     id: string;
@@ -103,7 +104,10 @@ async function searchWithSerper(query: string, limit: number): Promise<ImageSear
     const candidates: ImageSearchCandidate[] = [];
 
     for (const item of payload.images ?? []) {
-        const imageUrl = item.imageUrl?.trim();
+        const imageUrl = pickSearchResultImageUrl({
+            imageUrl: item.imageUrl,
+            thumbnailUrl: item.thumbnailUrl,
+        });
         if (!imageUrl || seen.has(imageUrl)) continue;
         seen.add(imageUrl);
 
@@ -186,17 +190,21 @@ async function searchWithGoogleCse(query: string, limit: number): Promise<ImageS
         if (items.length === 0) break;
 
         for (const item of items) {
-            const imageUrl = item.link?.trim();
+            const thumbnailUrl = item.image?.thumbnailLink?.trim();
+            const imageUrl = pickSearchResultImageUrl({
+                imageUrl: item.link,
+                thumbnailUrl,
+            });
             if (!imageUrl || seen.has(imageUrl)) continue;
             seen.add(imageUrl);
 
-            const thumbnailUrl = item.image?.thumbnailLink?.trim() || imageUrl;
+            const thumb = thumbnailUrl || imageUrl;
             const sourcePage = item.image?.contextLink?.trim() || imageUrl;
 
             candidates.push({
                 id: candidateId(imageUrl),
                 imageUrl,
-                thumbnailUrl,
+                thumbnailUrl: thumb,
                 title: item.title?.trim() || "Sin titulo",
                 sourcePage,
                 sourceHost: item.displayLink?.trim() || hostFromUrl(sourcePage),

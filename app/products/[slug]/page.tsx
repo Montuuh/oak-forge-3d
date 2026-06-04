@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { AdminProductMaintenanceLink } from "@/components/AdminProductMaintenanceLink";
 import { CatalogProductImage } from "@/components/CatalogProductImage";
 import { hasCatalogImage } from "@/lib/catalog-image";
 import { formatPrintTime, formatWeight, resolveProductImagePath } from "@/lib/product-display";
@@ -68,7 +69,7 @@ export default async function ProductPage({ params }: PageProps) {
         <div className="min-h-screen py-8 md:py-16">
             <div className="container mx-auto px-4 md:px-6">
                 {/* Breadcrumb */}
-                <nav className="mb-8">
+                <nav className="mb-8 flex flex-wrap items-center justify-between gap-3">
                     <ol className="flex items-center gap-2 text-sm text-zinc-500">
                         <li>
                             <Link href="/" className="hover:text-white transition-colors">
@@ -84,6 +85,7 @@ export default async function ProductPage({ params }: PageProps) {
                         <li>/</li>
                         <li className="text-white">{product.name}</li>
                     </ol>
+                    <AdminProductMaintenanceLink slug={params.slug} />
                 </nav>
 
                 <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
