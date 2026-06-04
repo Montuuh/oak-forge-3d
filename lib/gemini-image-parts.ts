@@ -1,4 +1,5 @@
 import type { GenerationImageInputs } from "@/lib/ai-image-inputs";
+import { V7_CENTER_FINAL_CHECK } from "@/lib/ai-image-prompt";
 import {
     getDefaultPromptVersion,
     isV6PromptVersion,
@@ -14,17 +15,22 @@ export type GeminiContentPart =
     | { text: string }
     | { inlineData: { mimeType: string; data: string } };
 
+const V7_CENTER_PRIORITY_TEXT =
+    "[CENTER — TOP PRIORITY]\n" +
+    "The output Pokéball must sit on the vertical centerline of the image (50% width, equal margin left and right).\n" +
+    "This overrides scene perspective, product-reference cropping, and rule-of-thirds habits.";
+
 const V7_SCENE_ANCHOR_TEXT =
-    "[SCENE LOCK — HIGHEST PRIORITY]\n" +
-    "This image is the ONLY source for: oak desk, gotelé wall, camera angle, and lighting.\n" +
-    "Key light from the LEFT side of the frame (viewer's left). Shadows on the desk fall toward the RIGHT.\n" +
-    "Do NOT mirror, flip, or reverse the lighting. Do NOT use key light from the right.\n" +
-    "Endless diagonal desk plane as shown. Output must look photographed IN THIS EXACT ROOM.";
+    "[SCENE — MATERIALS + LIGHT ONLY]\n" +
+    "This image has NO product. Use it ONLY for: oak desk wood, gotelé wall, and lighting direction.\n" +
+    "Key light from the LEFT (viewer's left); shadows on the desk toward the RIGHT.\n" +
+    "Do NOT copy this photo's camera angle, desk diagonal, or empty-space layout.\n" +
+    "Output uses straight-on centered camera; Pokéball placed at horizontal center of frame.";
 
 const V7_SCENE_REPEAT_TEXT =
-    "[FINAL CHECK — MATCH SCENE AGAIN]\n" +
-    "Match desk, gotelé wall, diagonal angle, and LEFT-side key light exactly like this SCENE image. " +
-    "Product references must NOT override environment or lighting.";
+    "[SCENE REMINDER — LIGHT + MATERIALS]\n" +
+    "Match oak desk, gotelé wall, and LEFT key light from this SCENE image. " +
+    "Do NOT copy scene camera angle. Pokéball stays on vertical centerline of output.";
 
 function inlinePart(file: { buffer: Buffer; mimeType: string }): GeminiContentPart {
     return {
@@ -90,8 +96,9 @@ function buildV7ReferenceIntro(
     productCount: number,
 ): string {
     return (
-        `Locked studio composite: ${sceneCount} SCENE image(s) define room, desk, wall, camera, and lighting (LEFT key light). ` +
-        `${productCount} PRODUCT image(s) define collectible shape/color ONLY — never their lighting or background. ` +
+        `Locked studio: ${productCount} PRODUCT image(s) = shape/color only. ` +
+        `${sceneCount} SCENE image(s) = oak desk, gotelé wall, LEFT key light only (no camera angle). ` +
+        "Output: straight-on camera, Pokéball on vertical centerline of frame. " +
         "Do NOT replace the object with a generic standing Pokémon figure."
     );
 }
@@ -166,18 +173,23 @@ function buildV7GeminiParts(
     const productRefs = refs.filter((ref) => ref.role !== "scene");
     const parts: GeminiContentPart[] = [];
 
+    parts.push({ text: V7_CENTER_PRIORITY_TEXT });
     parts.push({
         text: buildV7ReferenceIntro(sceneRefs.length, productRefs.length),
     });
 
-    for (const ref of sceneRefs) {
-        parts.push({ text: V7_SCENE_ANCHOR_TEXT });
+    for (const ref of productRefs) {
+        parts.push({
+            text:
+                "PRODUCT — shape/color only; IGNORE its position in frame — re-center subject in output.",
+        });
+        parts.push({ text: v7ProductPreamble(ref) });
         parts.push({ text: `[${roleHintForReference(ref, v6, true)}: ${ref.label}]` });
         parts.push(inlinePart(ref));
     }
 
-    for (const ref of productRefs) {
-        parts.push({ text: v7ProductPreamble(ref) });
+    for (const ref of sceneRefs) {
+        parts.push({ text: V7_SCENE_ANCHOR_TEXT });
         parts.push({ text: `[${roleHintForReference(ref, v6, true)}: ${ref.label}]` });
         parts.push(inlinePart(ref));
     }
@@ -187,8 +199,10 @@ function buildV7GeminiParts(
         parts.push(inlinePart(ref));
     }
 
+    parts.push({ text: V7_CENTER_FINAL_CHECK });
     parts.push({ text: "--- SCENE AND STYLE INSTRUCTIONS ---" });
     parts.push({ text: prompt });
+    parts.push({ text: V7_CENTER_FINAL_CHECK });
     return parts;
 }
 

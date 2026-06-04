@@ -23,8 +23,30 @@ export type BacklogSortField =
 
 export type BacklogSortOrder = "asc" | "desc";
 
+export const BACKLOG_STATUSES: BacklogStatus[] = [
+    "pending",
+    "in_progress",
+    "done",
+    "cancelled",
+];
+
+/** Filtro de estado por defecto en /admin/backlog (sin query en la URL). */
+export const DEFAULT_BACKLOG_STATUS_FILTER: BacklogStatus[] = ["pending", "in_progress"];
+
+export function isDefaultBacklogStatusFilter(
+    status: BacklogStatus[] | "all" | undefined,
+): boolean {
+    if (!status || status === "all") return false;
+    if (status.length !== DEFAULT_BACKLOG_STATUS_FILTER.length) return false;
+    return DEFAULT_BACKLOG_STATUS_FILTER.every((s) => status.includes(s));
+}
+
+export function isBacklogStatus(value: string): value is BacklogStatus {
+    return (BACKLOG_STATUSES as string[]).includes(value);
+}
+
 export type BacklogListQuery = {
-    status?: BacklogStatus | "all";
+    status?: BacklogStatus[] | "all";
     priority?: BacklogPriority | "all";
     category?: string;
     q?: string;

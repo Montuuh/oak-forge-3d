@@ -6,6 +6,11 @@ import type {
     BacklogSortField,
     BacklogSortOrder,
 } from "@/lib/admin-backlog-types";
+import {
+    DEFAULT_BACKLOG_STATUS_FILTER,
+    isBacklogStatus,
+    type BacklogStatus as BacklogStatusFilter,
+} from "@/lib/admin-backlog-types";
 import { db } from "@/lib/db";
 
 const PRIORITY_ORDER: Record<BacklogPriority, number> = {
@@ -70,6 +75,41 @@ function sortBacklogRows(
     });
 }
 
+function parseStatusFilter(
+    input: Record<string, string | string[] | undefined>,
+): BacklogStatusFilter[] | "all" {
+    const raw = input.status;
+    if (raw === undefined) return DEFAULT_BACKLOG_STATUS_FILTER;
+
+    const parts: string[] = [];
+    if (typeof raw === "string") {
+        parts.push(...raw.split(","));
+    } else {
+        for (const value of raw) {
+            parts.push(...value.split(","));
+        }
+    }
+
+    const trimmed = parts.map((part) => part.trim());
+    if (trimmed.length === 1 && trimmed[0] === "all") return "all";
+
+    const statuses = Array.from(new Set(trimmed.filter(isBacklogStatus)));
+
+    return statuses.length === 0 ? "all" : statuses;
+}
+
+/** Convierte URLSearchParams en record (varios valores por clave, p. ej. status). */
+export function backlogSearchParamsToRecord(
+    params: URLSearchParams,
+): Record<string, string | string[]> {
+    const out: Record<string, string | string[]> = {};
+    for (const key of Array.from(new Set(params.keys()))) {
+        const values = params.getAll(key);
+        out[key] = values.length === 1 ? values[0]! : values;
+    }
+    return out;
+}
+
 export function parseBacklogListQuery(
     input: Record<string, string | string[] | undefined>,
 ): BacklogListQuery {
@@ -78,19 +118,12 @@ export function parseBacklogListQuery(
         return typeof value === "string" ? value : undefined;
     };
 
-    const status = pick("status");
     const priority = pick("priority");
     const sort = pick("sort");
     const order = pick("order");
 
     return {
-        status:
-            status === "pending" ||
-            status === "in_progress" ||
-            status === "done" ||
-            status === "cancelled"
-                ? status
-                : "all",
+        status: parseStatusFilter(input),
         priority:
             priority === "high" || priority === "medium" || priority === "low"
                 ? priority
@@ -111,7 +144,7 @@ export function parseBacklogListQuery(
 }
 
 export async function listBacklogItems(query: BacklogListQuery = {}): Promise<BacklogItem[]> {
-    const status = query.status ?? "all";
+    const status = query.status ?? DEFAULT_BACKLOG_STATUS_FILTER;
     const priority = query.priority ?? "all";
     const category = query.category ?? "all";
     const sort = query.sort ?? "priority";
@@ -120,7 +153,9 @@ export async function listBacklogItems(query: BacklogListQuery = {}): Promise<Ba
 
     const rows = await db.backlogTask.findMany({
         where: {
-            ...(status !== "all" ? { status } : {}),
+            ...(status !== "all"
+                ? { status: status.length === 1 ? status[0] : { in: status } }
+                : {}),
             ...(priority !== "all" ? { priority } : {}),
             ...(category !== "all" ? { category } : {}),
             ...(q

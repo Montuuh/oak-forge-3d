@@ -3,7 +3,10 @@ import { notFound, redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { AdminCollapsibleSection } from "@/components/admin/AdminCollapsibleSection";
 import { AdminProductActions } from "@/components/admin/AdminProductActions";
-import { AdminProductEditForm } from "@/components/admin/AdminProductEditForm";
+import {
+    ADMIN_PRODUCT_EDIT_FORM_ID,
+    AdminProductEditForm,
+} from "@/components/admin/AdminProductEditForm";
 import { ProductImagesPanel } from "@/components/admin/ProductImagesPanel";
 import { formatN3dSyncedAtLabel } from "@/lib/n3d-sync-timestamp";
 import { getProductWithImagesBySlug } from "@/lib/admin-images";
@@ -209,7 +212,19 @@ export default async function AdminProductDetailPage({ params, searchParams }: P
                         />
                     </AdminCollapsibleSection>
 
-                    <AdminCollapsibleSection title="Datos generales" subtitle="Nombre, precio, catálogo, Pokémon">
+                    <AdminCollapsibleSection
+                        title="Datos generales"
+                        subtitle="Nombre, precio, catálogo, Pokémon"
+                        headerAction={
+                            <button
+                                type="submit"
+                                form={ADMIN_PRODUCT_EDIT_FORM_ID}
+                                className="rounded-lg bg-oak-600 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-oak-500"
+                            >
+                                Guardar cambios
+                            </button>
+                        }
+                    >
                         <AdminProductEditForm bare product={product} action={saveProduct} />
                     </AdminCollapsibleSection>
                 </div>

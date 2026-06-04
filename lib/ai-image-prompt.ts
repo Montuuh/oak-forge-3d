@@ -65,7 +65,11 @@ const NEGATIVE_PROMPT_V7 =
     "copying products or props from the scene reference image, " +
     "visible end of tabletop, desk edge facing camera, truncated desk, front lip of table in frame, " +
     "key light from right, main light from right, rim light only from left, shadows falling left, " +
-    "mirrored or flipped lighting vs SCENE reference, lighting copied from N3D or geometry reference";
+    "mirrored or flipped lighting vs SCENE reference, lighting copied from N3D or geometry reference, " +
+    "off-center product, subject on left third, subject on right third, rule-of-thirds offset, " +
+    "asymmetric hero placement, product hugging frame edge, copying off-center framing from product references, " +
+    "diagonal desk composition pushing subject to corner, scene-reference camera angle, Dutch angle, " +
+    "product on left half of frame, product on right half of frame, not centered on vertical midline";
 
 const V7_LIGHTING_NEGATIVE =
     "opposite light direction, reversed shadows, product-reference lighting overriding scene";
@@ -88,14 +92,31 @@ export function pickCameraYawForPromptVersion(version: string): number {
     return pickLifestyleCameraYawDegrees();
 }
 
-function formatV7SceneLockedCameraLines(): string[] {
+/** v7: cámara frontal centrada. La escena solo aporta materiales y luz, no encuadre diagonal. */
+function formatV7CenteredCameraLines(): string[] {
     return [
-        "Camera: match the SCENE reference — moderate diagonal angle to the oak desk (roughly 25–35° from parallel to the surface, not straight-down or straight-on to the wall).",
-        "50mm lens look, f/2.8 aperture, eye-level, gentle background softness on the gotelé wall only.",
-        "Desk geometry: the oak tabletop must continue beyond the frame on left, right, and especially toward the camera — no visible end, lip, or drop-off of the desk.",
-        "Composition: place the collectible on the same diagonal desk plane as the SCENE reference.",
+        "[CAMERA — CENTERED HERO (overrides scene framing)]",
+        "Camera: straight-on front view, 0° horizontal yaw, 50mm lens look, f/2.8, eye-level — symmetric product shot.",
+        "The SCENE reference supplies oak desk grain, gotelé wall, and LEFT-side key light ONLY.",
+        "Do NOT copy the SCENE image camera angle, perspective skew, desk diagonal, or empty-space layout — the scene photo has no product.",
+        "Desk: continuous oak surface extending beyond the frame; no visible table edge toward the camera.",
+        "Composition: Pokéball on the vertical centerline of the frame (50% image width) with equal desk visible left and right of the ball.",
     ];
 }
+
+function formatV7CompositionLines(): string[] {
+    return [
+        "[COMPOSITION — MANDATORY CENTER]",
+        "Highest priority: the Pokéball sits on the exact horizontal center of the output image (symmetric left/right margin).",
+        "Vertically: middle third on the desk — not on a rule-of-thirds line, not near a frame edge.",
+        "Ignore off-center cropping in N3D or local product references — re-center the subject in frame.",
+    ];
+}
+
+export const V7_CENTER_FINAL_CHECK =
+    "[FINAL — CENTER CHECK]\n" +
+    "Before finishing: Pokéball must be on the vertical centerline of the image (equal space on left and right). " +
+    "If the ball drifted left or right, move it to the middle of the frame.";
 
 function formatCameraAngleLines(yawDegrees: number): string[] {
     const lens = "50mm lens, f/2.8 aperture, eye-level, gentle background softness (wall only, not busy).";
@@ -152,7 +173,7 @@ function inferColorPalette(pokemonTypes: string[] | undefined): {
 }
 
 const V7_RE_STAGE =
-    "Place the collectible in the SCENE reference environment; match desk and wall exactly; remove only watermark and original props from product refs.";
+    "Place the collectible in the SCENE reference environment; center it horizontally in frame; match desk and wall exactly; remove only watermark and original props from product refs.";
 
 function buildSubjectLine(
     product: LifestylePromptProduct,
@@ -299,11 +320,10 @@ function formatV7LightingLines(): string[] {
 function buildSceneBlock(v7: boolean, hasScene: boolean): string[] {
     if (v7 && hasScene) {
         return [
-            "[SCENE — LOCKED STUDIO]",
-            "The SCENE reference image defines the entire environment: endless continuous oak wood desk (surface extends beyond the frame — no visible end or front edge of the table), soft neutral gotelé wall, eye-level product height.",
-            "Match desk grain, diagonal angle to the desk plane, wall texture, horizon line, and soft natural daylight from the left (~45° elevation) exactly across every shot.",
-            "Do NOT invent a different room, desk material, wall finish, lighting direction, or camera-to-desk angle.",
-            "NO props, NO accessories on the desk — only the collectible and honest wood surface.",
+            "[SCENE — MATERIALS + LIGHT ONLY]",
+            "The SCENE reference has NO product — use it only for: oak wood tone/grain, gotelé wall texture, and soft daylight from the left (~45° elevation) with shadows falling right.",
+            "Do NOT copy the scene photo's camera angle, perspective, or where empty space sits in frame.",
+            "Output camera is straight-on and centered (see CAMERA block). Continuous oak desk, no visible table end, NO props.",
         ];
     }
 
@@ -345,10 +365,10 @@ export function buildLifestyleImagePrompt(
     const negativeExtra = n3dColor ? N3D_SUBJECT_NEGATIVE + ", " : "";
     const cameraYaw =
         options?.cameraYawDegrees ?? pickCameraYawForPromptVersion(version);
-    const useSceneLockedCamera = v7 && hasSceneReference(inputs);
-    const cameraLines = useSceneLockedCamera
-        ? formatV7SceneLockedCameraLines()
-        : formatCameraAngleLines(cameraYaw);
+    const cameraLines =
+        v7 && hasSceneReference(inputs)
+            ? formatV7CenteredCameraLines()
+            : formatCameraAngleLines(cameraYaw);
     const negativePrompt = v7
         ? NEGATIVE_PROMPT_V7
         : v6
@@ -367,12 +387,15 @@ export function buildLifestyleImagePrompt(
         ...sceneBlock,
         ...lightingBlock,
         ...cameraLines,
+        ...(v7 ? formatV7CompositionLines() : []),
         "",
         "[POSITIVE PROMPT]",
         ...subjectLines,
         n3dColor ? "" : `NOT ${blockColor}.`,
         buildFinishLine(product.slug, inputs),
-        "Centered or rule-of-thirds composition; the collectible is the sole hero subject.",
+        v7
+            ? "The collectible is the sole hero subject — centered in frame (see COMPOSITION block)."
+            : "Centered composition; the collectible is the sole hero subject.",
         v7
             ? "Final lighting check: key light from viewer's LEFT; desk shadows toward viewer's RIGHT; identical to SCENE reference — not from product refs."
             : "Continuous oak desk visible between camera and object; soft natural daylight from the left. Neutral color temperature; soft contact shadow on the desk.",

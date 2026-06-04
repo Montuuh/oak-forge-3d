@@ -21,7 +21,11 @@ export function resolveGeminiOutputAspectRatio(promptVersion?: string | null): s
         return override;
     }
     if (promptVersion && isV7PromptVersion(promptVersion)) {
-        return "16:9";
+        const v7Default = process.env.V7_IMAGE_ASPECT_RATIO?.trim();
+        if (v7Default && VALID_ASPECT_RATIOS.has(v7Default)) {
+            return v7Default;
+        }
+        return "4:3";
     }
     return "4:3";
 }

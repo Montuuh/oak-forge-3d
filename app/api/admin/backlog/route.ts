@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { adminApiErrorResponse } from "@/lib/admin-api-response";
 import {
+    backlogSearchParamsToRecord,
     countBacklogByStatus,
     createBacklogItem,
     getBacklogMeta,
@@ -17,7 +18,7 @@ export async function GET(request: NextRequest) {
     try {
         assertAdminRequest(request);
         const query = parseBacklogListQuery(
-            Object.fromEntries(request.nextUrl.searchParams.entries()),
+            backlogSearchParamsToRecord(request.nextUrl.searchParams),
         );
         const [items, counts, categories, meta] = await Promise.all([
             listBacklogItems(query),

@@ -5,7 +5,11 @@ import Image from "next/image";
 import { useFavorites } from "@/contexts/FavoritesContext";
 import { useTheme } from "@/contexts/ThemeContext";
 
-export default function Header() {
+type HeaderProps = {
+    isAdminLoggedIn?: boolean;
+};
+
+export default function Header({ isAdminLoggedIn = false }: HeaderProps) {
     const { favorites, showOnlyFavorites, toggleShowOnlyFavorites } = useFavorites();
     const { theme, setTheme } = useTheme();
     const favoritesCount = favorites.length;
@@ -49,6 +53,14 @@ export default function Header() {
                             >
                                 Contacto
                             </Link>
+                            {isAdminLoggedIn ? (
+                                <Link
+                                    href="/admin"
+                                    className="text-sm text-zinc-400 hover:text-[#7EC8A3] transition-colors"
+                                >
+                                    Admin
+                                </Link>
+                            ) : null}
 
                             {/* Theme Toggle */}
                             <button

@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminPage() {
     const [pendingAll, counts] = await Promise.all([
-        listBacklogItems({ status: "pending", sort: "priority", order: "asc" }),
+        listBacklogItems({ status: ["pending"], sort: "priority", order: "asc" }),
         countBacklogByStatus(),
     ]);
     const pending = pendingAll.slice(0, 5);

@@ -9,6 +9,8 @@ import {
     type BacklogPriority,
     type BacklogSortField,
     type BacklogSortOrder,
+    DEFAULT_BACKLOG_STATUS_FILTER,
+    isDefaultBacklogStatusFilter,
     type BacklogStatus,
 } from "@/lib/admin-backlog-types";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -55,7 +57,13 @@ async function apiJson<T>(url: string, init?: RequestInit): Promise<T> {
 
 function buildQueryString(query: BacklogListQuery): string {
     const params = new URLSearchParams();
-    if (query.status && query.status !== "all") params.set("status", query.status);
+    if (query.status === "all") {
+        params.set("status", "all");
+    } else if (query.status && !isDefaultBacklogStatusFilter(query.status)) {
+        for (const status of query.status) {
+            params.append("status", status);
+        }
+    }
     if (query.priority && query.priority !== "all") params.set("priority", query.priority);
     if (query.category && query.category !== "all") params.set("category", query.category);
     if (query.q) params.set("q", query.q);
@@ -84,7 +92,44 @@ export function AdminBacklogBoard({
     const [priority, setPriority] = useState<BacklogPriority>("medium");
     const [searchDraft, setSearchDraft] = useState(query.q ?? "");
 
-    const statusFilter = query.status ?? "all";
+    function effectiveStatusFilter(): BacklogStatus[] | "all" {
+        const status = query.status;
+        if (status === "all") return "all";
+        if (!status || isDefaultBacklogStatusFilter(status)) return DEFAULT_BACKLOG_STATUS_FILTER;
+        return status;
+    }
+
+    function isStatusFilterActive(value: "all" | BacklogStatus): boolean {
+        if (value === "all") return query.status === "all";
+        const current = effectiveStatusFilter();
+        if (current === "all") return false;
+        return current.includes(value);
+    }
+
+    function toggleStatusFilter(value: "all" | BacklogStatus) {
+        if (value === "all") {
+            patchQuery({ status: "all" });
+            return;
+        }
+
+        const current = effectiveStatusFilter();
+        if (current === "all") {
+            patchQuery({ status: [value] });
+            return;
+        }
+
+        const next = new Set(current);
+        if (next.has(value)) {
+            next.delete(value);
+            patchQuery({
+                status:
+                    next.size === 0 ? DEFAULT_BACKLOG_STATUS_FILTER : Array.from(next),
+            });
+        } else {
+            next.add(value);
+            patchQuery({ status: Array.from(next) });
+        }
+    }
     const priorityFilter = query.priority ?? "all";
     const categoryFilter = query.category ?? "all";
     const sortField = query.sort ?? "priority";
@@ -211,9 +256,9 @@ export function AdminBacklogBoard({
                         <button
                             key={value}
                             type="button"
-                            onClick={() => patchQuery({ status: value })}
+                            onClick={() => toggleStatusFilter(value)}
                             className={`rounded-lg px-3 py-1.5 text-sm transition ${
-                                statusFilter === value
+                                isStatusFilterActive(value)
                                     ? "bg-oak-600 text-white"
                                     : "border border-white/10 text-zinc-400 hover:bg-white/5"
                             }`}
@@ -314,7 +359,7 @@ export function AdminBacklogBoard({
                             onClick={() => {
                                 setSearchDraft("");
                                 pushQuery({
-                                    status: "all",
+                                    status: DEFAULT_BACKLOG_STATUS_FILTER,
                                     priority: "all",
                                     category: "all",
                                     sort: "priority",

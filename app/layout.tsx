@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/Header";
+import PublicSiteHeader from "@/components/PublicSiteHeader";
 import Footer from "@/components/Footer";
 import { FavoritesProvider } from "@/contexts/FavoritesContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
@@ -40,7 +40,7 @@ export default function RootLayout({
             <body className="min-h-screen flex flex-col">
                 <ThemeProvider>
                     <FavoritesProvider>
-                        <Header />
+                        <PublicSiteHeader />
                         <main className="flex-1">
                             {children}
                         </main>

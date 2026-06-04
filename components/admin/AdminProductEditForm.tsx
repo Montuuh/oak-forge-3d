@@ -10,17 +10,25 @@ type ProductWithImages = Product & {
     filaments: ProductFilament[];
 };
 
+export const ADMIN_PRODUCT_EDIT_FORM_ID = "admin-product-edit-form";
+
 type AdminProductEditFormProps = {
     product: ProductWithImages;
     action: (formData: FormData) => Promise<void>;
     bare?: boolean;
+    formId?: string;
 };
 
-export function AdminProductEditForm({ product, action, bare = false }: AdminProductEditFormProps) {
+export function AdminProductEditForm({
+    product,
+    action,
+    bare = false,
+    formId = ADMIN_PRODUCT_EDIT_FORM_ID,
+}: AdminProductEditFormProps) {
     const formClass = bare ? "space-y-6" : "glass space-y-6 rounded-2xl border border-white/10 p-4 md:p-6";
 
     return (
-        <form action={action} className={formClass}>
+        <form id={formId} action={action} className={formClass}>
             <input type="hidden" name="id" value={product.id} />
             <input type="hidden" name="slug" value={product.slug} />
 

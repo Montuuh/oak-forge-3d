@@ -12,7 +12,7 @@ export const PROMPT_VERSION_OPTIONS = [
     {
         value: PROMPT_VERSION_V7,
         label: "v7",
-        hint: "Estudio fijo (mesa + gotelé) + ref. de escena",
+        hint: "Estudio fijo, bola centrada (4:3), ref. escena solo luz/mesa",
     },
 ] as const;
 
