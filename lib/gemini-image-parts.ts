@@ -25,12 +25,13 @@ const V7_SCENE_ANCHOR_TEXT =
     "This image has NO product. Use it ONLY for: oak desk wood, gotelé wall, and lighting direction.\n" +
     "Key light from the LEFT (viewer's left); shadows on the desk toward the RIGHT.\n" +
     "Do NOT copy this photo's camera angle, desk diagonal, or empty-space layout.\n" +
+    "IGNORE and NEVER output the Gemini/Google AI watermark if present in the bottom-right corner of this scene photo.\n" +
     "Output uses straight-on centered camera; Pokéball placed at horizontal center of frame.";
 
 const V7_SCENE_REPEAT_TEXT =
     "[SCENE REMINDER — LIGHT + MATERIALS]\n" +
     "Match oak desk, gotelé wall, and LEFT key light from this SCENE image. " +
-    "Do NOT copy scene camera angle. Pokéball stays on vertical centerline of output.";
+    "Do NOT copy scene camera angle. No Gemini watermark in bottom-right. Pokéball stays on vertical centerline of output.";
 
 function inlinePart(file: { buffer: Buffer; mimeType: string }): GeminiContentPart {
     return {

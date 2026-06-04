@@ -69,7 +69,15 @@ const NEGATIVE_PROMPT_V7 =
     "off-center product, subject on left third, subject on right third, rule-of-thirds offset, " +
     "asymmetric hero placement, product hugging frame edge, copying off-center framing from product references, " +
     "diagonal desk composition pushing subject to corner, scene-reference camera angle, Dutch angle, " +
-    "product on left half of frame, product on right half of frame, not centered on vertical midline";
+    "product on left half of frame, product on right half of frame, not centered on vertical midline, " +
+    "Gemini watermark, Google Gemini logo, AI generator watermark, sparkle Gemini badge, " +
+    "semi-transparent logo bottom right corner, watermark copied from scene reference, " +
+    "any text or logo in lower right of frame";
+
+const V7_SCENE_WATERMARK_RULE =
+    "The SCENE reference may include a Gemini/Google AI watermark in the bottom-right corner — " +
+    "it is NOT part of the studio set. NEVER reproduce, copy, blend, or leave that watermark in the output; " +
+    "clean oak desk and gotelé wall only in that corner.";
 
 const V7_LIGHTING_NEGATIVE =
     "opposite light direction, reversed shadows, product-reference lighting overriding scene";
@@ -173,7 +181,8 @@ function inferColorPalette(pokemonTypes: string[] | undefined): {
 }
 
 const V7_RE_STAGE =
-    "Place the collectible in the SCENE reference environment; center it horizontally in frame; match desk and wall exactly; remove only watermark and original props from product refs.";
+    "Place the collectible in the SCENE reference environment; center it horizontally in frame; match desk and wall exactly; " +
+    "remove Gemini watermark from scene ref (bottom-right corner), watermarks from product refs, and original props.";
 
 function buildSubjectLine(
     product: LifestylePromptProduct,
@@ -323,6 +332,7 @@ function buildSceneBlock(v7: boolean, hasScene: boolean): string[] {
             "[SCENE — MATERIALS + LIGHT ONLY]",
             "The SCENE reference has NO product — use it only for: oak wood tone/grain, gotelé wall texture, and soft daylight from the left (~45° elevation) with shadows falling right.",
             "Do NOT copy the scene photo's camera angle, perspective, or where empty space sits in frame.",
+            V7_SCENE_WATERMARK_RULE,
             "Output camera is straight-on and centered (see CAMERA block). Continuous oak desk, no visible table end, NO props.",
         ];
     }
@@ -397,7 +407,8 @@ export function buildLifestyleImagePrompt(
             ? "The collectible is the sole hero subject — centered in frame (see COMPOSITION block)."
             : "Centered composition; the collectible is the sole hero subject.",
         v7
-            ? "Final lighting check: key light from viewer's LEFT; desk shadows toward viewer's RIGHT; identical to SCENE reference — not from product refs."
+            ? "Final lighting check: key light from viewer's LEFT; desk shadows toward viewer's RIGHT; identical to SCENE reference — not from product refs. " +
+              "Final cleanup: no Gemini watermark or any logo in the bottom-right corner."
             : "Continuous oak desk visible between camera and object; soft natural daylight from the left. Neutral color temperature; soft contact shadow on the desk.",
         "",
         "[NEGATIVE PROMPT]",
