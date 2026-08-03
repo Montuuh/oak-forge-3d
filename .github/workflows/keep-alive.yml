@@ -2,26 +2,69 @@ name: Supabase keep-alive
 
 on:
     schedule:
-        - cron: "0 7 */2 * *"
+        # Daily (UTC). Free-tier wants enough DB activity across the week.
+        - cron: "0 7 * * *"
     workflow_dispatch:
 
 jobs:
     ping:
         runs-on: ubuntu-latest
         steps:
-            - name: Ping keep-alive endpoint
+            - name: Ping Vercel keep-alive endpoint
+              id: vercel
               env:
                   KEEP_ALIVE_URL: ${{ vars.KEEP_ALIVE_URL }}
                   CRON_SECRET: ${{ secrets.CRON_SECRET }}
               run: |
-                  if [ -z "$KEEP_ALIVE_URL" ]; then
-                    echo "Missing repository variable KEEP_ALIVE_URL (e.g. https://your-app.vercel.app/api/cron/keep-alive)"
+                  set -euo pipefail
+                  if [ -z "${KEEP_ALIVE_URL:-}" ]; then
+                    echo "Missing repository variable KEEP_ALIVE_URL"
                     exit 1
                   fi
-                  if [ -z "$CRON_SECRET" ]; then
+                  if [ -z "${CRON_SECRET:-}" ]; then
                     echo "Missing repository secret CRON_SECRET"
                     exit 1
                   fi
-                  curl -fsS \
+                  echo "→ GET $KEEP_ALIVE_URL"
+                  code=$(curl -sS -o /tmp/ka-body -w "%{http_code}" \
                     -H "Authorization: Bearer ${CRON_SECRET}" \
-                    "$KEEP_ALIVE_URL"
+                    "$KEEP_ALIVE_URL")
+                  echo "HTTP $code"
+                  cat /tmp/ka-body
+                  echo
+                  if [ "$code" -lt 200 ] || [ "$code" -ge 300 ]; then
+                    exit 1
+                  fi
+                  echo "Vercel keep-alive OK"
+
+            - name: Ping Supabase Storage + REST (direct)
+              id: direct
+              env:
+                  SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+                  SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+              run: |
+                  set -euo pipefail
+                  if [ -z "${SUPABASE_URL:-}" ] || [ -z "${SUPABASE_SERVICE_ROLE_KEY:-}" ]; then
+                    echo "Skipping direct ping (add secrets SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY for extra resilience)"
+                    exit 0
+                  fi
+                  echo "→ Storage getBucket"
+                  curl -fsS \
+                    -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" \
+                    -H "apikey: ${SUPABASE_SERVICE_ROLE_KEY}" \
+                    "${SUPABASE_URL%/}/storage/v1/bucket/product-images" \
+                    | head -c 200
+                  echo
+                  echo "→ REST Product select"
+                  code=$(curl -sS -o /tmp/rest-body -w "%{http_code}" \
+                    -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" \
+                    -H "apikey: ${SUPABASE_SERVICE_ROLE_KEY}" \
+                    -H "Prefer: count=exact" \
+                    -H "Range: 0-0" \
+                    "${SUPABASE_URL%/}/rest/v1/Product?select=id")
+                  echo "HTTP $code"
+                  if [ "$code" -lt 200 ] || [ "$code" -ge 300 ]; then
+                    cat /tmp/rest-body
+                    exit 1
+                  fi
+                  echo "Direct Supabase ping OK"

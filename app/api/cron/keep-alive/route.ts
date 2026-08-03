@@ -27,7 +27,12 @@ export async function GET(request: NextRequest) {
             throw new Error(`Storage ping failed: ${storageError.message}`);
         }
 
-        return NextResponse.json({ ok: true, ts: new Date().toISOString() });
+        return NextResponse.json({
+            ok: true,
+            db: true,
+            storage: true,
+            ts: new Date().toISOString(),
+        });
     } catch (error) {
         const message = error instanceof Error ? error.message : "Keep-alive failed";
         return NextResponse.json({ ok: false, error: message }, { status: 500 });
