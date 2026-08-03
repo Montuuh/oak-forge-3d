@@ -4,7 +4,7 @@ import Link from "next/link";
 import { CatalogProductImage } from "@/components/CatalogProductImage";
 import { Product } from "@/types/product";
 import { formatPrintTime, formatWeight, resolveProductImagePath } from "@/lib/product-display";
-import { useFavorites } from "@/contexts/FavoritesContext";
+import { ProductFavoriteButton } from "@/components/ProductFavoriteButton";
 
 interface ProductCardProps {
     product: Product;
@@ -12,18 +12,10 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, index = 0 }: ProductCardProps) {
-    const { isFavorite, toggleFavorite } = useFavorites();
-    const isProductFavorite = isFavorite(product.slug);
     const imagePath = resolveProductImagePath(product);
 
     // Stagger animation delay
     const delay = Math.min(index * 50, 500);
-
-    const handleFavoriteClick = (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        toggleFavorite(product.slug);
-    };
 
     return (
         <Link
@@ -76,25 +68,15 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
                         ))}
                     </div>
 
-                    {/* Favorite button */}
-                    <button
-                        onClick={handleFavoriteClick}
-                        className={`absolute top-3 right-3 w-9 h-9 rounded-full backdrop-blur-sm flex items-center justify-center transition-all duration-200 hover:scale-110 ${isProductFavorite
-                            ? 'bg-[#D4A520] text-black'
-                            : 'bg-black/40 text-white/70 hover:bg-black/60 hover:text-white'
-                            }`}
-                        aria-label={isProductFavorite ? 'Quitar de favoritos' : 'Añadir a favoritos'}
+                    <span
+                        className="absolute top-3 right-3 z-10"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }}
                     >
-                        {isProductFavorite ? (
-                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                            </svg>
-                        ) : (
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                            </svg>
-                        )}
-                    </button>
+                        <ProductFavoriteButton slug={product.slug} className="static" />
+                    </span>
 
                     {/* Featured badge - moved below favorite button */}
                     {product.featured && (

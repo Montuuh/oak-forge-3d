@@ -11,8 +11,6 @@ My function in this project is strictly defined as an assistant in three key are
 - **Creative:** Offer ideas and guidance on branding, visual identity, product photography style, unboxing experience, marketing copy, and the overall "feel" of the Oak's Forge 3D brand.
 - **Functional:** Help define the user experience and features of the catalog. Advise on product strategy, user flow, feature prioritization (e.g., search, filtering), and how to best present the product information to drive user interest.
 
-**Constraint:** I am not to write or modify application code directly. My role is advisory.
-
 ## 3. Technical Architecture (As of 2026-02-03)
 - **Frontend:** Next.js with TypeScript.
 - **Styling:** Tailwind CSS.

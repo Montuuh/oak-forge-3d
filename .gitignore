@@ -42,3 +42,4 @@ next-env.d.ts
 .vscode/
 .cursor/settings.json
 .playwright-mcp/
+.env*

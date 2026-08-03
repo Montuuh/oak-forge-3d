@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { AdminProductMaintenanceLink } from "@/components/AdminProductMaintenanceLink";
 import { CatalogProductImage } from "@/components/CatalogProductImage";
+import { ProductFavoriteButton } from "@/components/ProductFavoriteButton";
 import { hasCatalogImage } from "@/lib/catalog-image";
 import { formatPrintTime, formatWeight, resolveProductImagePath } from "@/lib/product-display";
 import { getProductBySlug } from "@/lib/products";
@@ -101,7 +102,7 @@ export default async function ProductPage({ params }: PageProps) {
                             />
 
                             {/* Category badge */}
-                            <div className="absolute top-4 left-4">
+                            <div className="absolute top-4 left-4 z-10">
                                 <span className={`px-3 py-1 text-xs font-medium rounded-full ${product.category === 'character'
                                         ? 'bg-oak-500/80 text-white'
                                         : 'bg-forge-500/80 text-white'
@@ -109,6 +110,12 @@ export default async function ProductPage({ params }: PageProps) {
                                     {product.category === 'character' ? 'Personaje' : 'Pokéball'}
                                 </span>
                             </div>
+
+                            <ProductFavoriteButton
+                                slug={params.slug}
+                                size="lg"
+                                className="absolute top-4 right-4 z-10"
+                            />
                         </div>
                     </div>
 
